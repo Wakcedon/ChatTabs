@@ -26,8 +26,10 @@ dependencies {
     implementation project(':')
     implementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
-    implementation("me.shedaniel.cloth:cloth-config-fabric:${rootProject.cloth_config_version}")
-    implementation("com.terraformersmc:modmenu:${rootProject.modmenu_version}")
+    // Cloth Config and ModMenu are fabric-only development/runtime mods.
+    // Mark them compileOnly so they are not required for the common/neoforge compilation.
+    compileOnly("me.shedaniel.cloth:cloth-config-fabric:${rootProject.cloth_config_version}")
+    compileOnly("com.terraformersmc:modmenu:${rootProject.modmenu_version}")
 }
 
 // Also compile shared sources from root project so Loom sees Minecraft mappings

@@ -16,13 +16,13 @@
   },
 
   "license": "GPL-3.0",
-  "icon": "assets/chattabs-reloaded/icon.png",
+  "icon": "assets/chattabs/icon.png",
 
   "environment": "client",
   "entrypoints": {
-    "client": ["net.grilledham.chattabs.client.ChatTabsClient"],
-    "main": ["net.grilledham.chattabs.fabric.FabricEntrypoint"],
-    "modmenu": ["net.grilledham.chattabs.config.ModMenuIntegration"]
+    "client": ["net.wakcedon.chattabsreloaded.client.ChatTabsClient"],
+    "main": ["net.wakcedon.chattabsreloaded.fabric.FabricEntrypoint"],
+    "modmenu": ["net.wakcedon.chattabsreloaded.config.ModMenuIntegration"]
   },
 
   "mixins": [
