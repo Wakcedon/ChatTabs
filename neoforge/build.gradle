@@ -31,21 +31,7 @@ java {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
 }
-// Include the common module's source files so NeoForge can see shared classes like ChatTabs
-sourceSets {
-    main {
-        java {
-            srcDir project(':').sourceSets.main.java.srcDirs
-            // Exclude Fabric‑specific and client‑only source files from NeoForge compilation
-            exclude 'net/wakcedon/chattabsreloaded/fabric/**'
-            exclude 'net/wakcedon/chattabsreloaded/render/**'
-            exclude 'net/wakcedon/chattabsreloaded/mixin/**'
-            exclude 'net/wakcedon/chattabsreloaded/tabs/**'
-            exclude 'net/wakcedon/chattabsreloaded/render/**'
-            exclude 'net/wakcedon/chattabsreloaded/mixininterface/**'
-        }
-    }
-}
+// NeoForge module compiles only its own sources; common code is provided as a dependency.
 
 neoForge {
     version = rootProject.neoForge_version
