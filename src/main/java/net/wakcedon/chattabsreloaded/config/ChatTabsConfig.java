@@ -2,7 +2,6 @@ package net.wakcedon.chattabsreloaded.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.Strictness;
 import com.google.gson.annotations.Expose;
 import net.wakcedon.chattabsreloaded.ChatTabs;
 import net.wakcedon.chattabsreloaded.profiles.ServerProfile;
@@ -25,7 +24,7 @@ public class ChatTabsConfig {
             .registerTypeHierarchyAdapter(ChatTab.class, new ChatTabTypeAdapter())
             .registerTypeHierarchyAdapter(ChatLineFilter.class, new ChatLineFilterTypeAdapter())
             .excludeFieldsWithoutExposeAnnotation()
-            .setStrictness(Strictness.LENIENT)
+            .setLenient()
             .create();
 
     @Expose

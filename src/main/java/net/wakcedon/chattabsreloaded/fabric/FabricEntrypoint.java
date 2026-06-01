@@ -9,5 +9,3 @@ public class FabricEntrypoint implements ModInitializer {
         net.wakcedon.chattabsreloaded.ChatTabs.init();
     }
 }
-    }
-}
