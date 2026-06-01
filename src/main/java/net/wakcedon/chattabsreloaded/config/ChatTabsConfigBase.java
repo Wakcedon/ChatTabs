@@ -78,6 +78,13 @@ public class ChatTabsConfigBase {
 
     public PlatformConfig platformConfig;
 
+    public static ChatTabsConfigBase getInstance() {
+        if (platformConfig != null) {
+            return platformConfig.getConfig();
+        }
+        return new ChatTabsConfigBase();
+    }
+
     public List<ChatTab> getVisibleChatTabs() {
         // Базовая реализация без платформо-специфичной логики
         return chatTabs.stream().filter(ChatTab::isVisibleByDefault).toList();

@@ -32,7 +32,7 @@ public class FabricChatTabsConfig extends ChatTabsConfigBase {
     public static FabricChatTabsConfig getInstance() {
         if (INSTANCE == null) {
             try {
-                load();
+                loadConfig();
             } catch (Throwable t) {
                 INSTANCE = new FabricChatTabsConfig();
             }
@@ -40,7 +40,7 @@ public class FabricChatTabsConfig extends ChatTabsConfigBase {
         return INSTANCE;
     }
 
-    public static void load() {
+    public static void loadConfig() {
         Path cfg = getConfigFile();
         try {
             if (Files.exists(cfg)) {
