@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - name: Grant execute
+        run: chmod +x gradlew
+      - name: Build Fabric and NeoForge
+        run: ./gradlew -Pci=true :fabric:build :neoforge:build --no-daemon --parallel
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: chattabs-artifacts
+          path: |
+            fabric/build/libs/*.jar
+            neoforge/build/libs/*.jar

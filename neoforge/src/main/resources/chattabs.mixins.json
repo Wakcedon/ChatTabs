@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.grilledham.chattabs.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "MixinChatHud$Hud"
+  ],
+  "client": [
+    "MixinAlphaCalculator",
+    "MixinChatHud",
+    "MixinChatHud$Forwarder",
+    "MixinChatHud$Interactable",
+    "MixinChatScreen"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

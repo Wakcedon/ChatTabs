@@ -10,3 +10,5 @@ pluginManagement {
         id 'net.fabricmc.fabric-loom' version loom_version
     }
 }
+
+include 'fabric', 'neoforge'

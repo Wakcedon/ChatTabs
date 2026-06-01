@@ -1,0 +1,32 @@
+plugins {
+    id 'net.neoforged.moddev' version '1.0.11'
+    id 'maven-publish'
+}
+
+version = rootProject.mod_version
+group = rootProject.maven_group
+
+repositories {
+    maven { url 'https://maven.su5ed.dev/releases' }
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':')
+    // Forgified Fabric API helps bridge Fabric API calls on NeoForge
+    implementation "org.sinytra.forgified-fabric-api:forgified-fabric-api:${rootProject.forgified_fabric_api_version}"
+}
+
+neoForge {
+    version = rootProject.neoForge_version
+    validateAccessTransformers = true
+    // Pull the access widener produced for Fabric and apply it for NeoForge runs
+    accessTransformers.from "../fabric/src/main/resources/chattabs.accesswidener"
+    mods {
+        chattabs {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+publishing { publications { create('mavenJava', MavenPublication) { from components.java } } }

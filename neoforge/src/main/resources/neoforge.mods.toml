@@ -1,0 +1,8 @@
+modLoader="neoForge"
+loaderVersion="[21,22)"
+
+[[mods]]
+modId="chattabs"
+version="${mod_version}"
+displayName="ChatTabs"
+description='''Adds customizable tabs to the chat screen'''

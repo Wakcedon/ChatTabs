@@ -20,7 +20,7 @@
   "environment": "client",
   "entrypoints": {
     "client": ["net.grilledham.chattabs.client.ChatTabsClient"],
-    "main": ["net.grilledham.chattabs.ChatTabs"],
+    "main": ["net.grilledham.chattabs.fabric.FabricEntrypoint"],
     "modmenu": ["net.grilledham.chattabs.config.ModMenuIntegration"]
   },
 
