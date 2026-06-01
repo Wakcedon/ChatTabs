@@ -12,7 +12,8 @@ public class FabricChatHudOverlays {
     
     public static int[] renderChatTabs(Minecraft client, int tabScroll, GuiGraphicsExtractor context, int windowHeight, float chatScale, boolean expanded, int chatWidth, int mouseX, int mouseY, int messages, boolean mcTabUnreads) {
         int hoveredTab = -1;
-        if(!FabricConfig.getConfig().getConfig().enabled || FabricConfig.getConfig().getConfig().getVisibleChatTabs().isEmpty() || !expanded || chatScale == 0) return new int[]{hoveredTab, tabScroll};
+        FabricConfig config = FabricConfig.getConfig();
+        if(!config.getConfig().enabled || config.getConfig().getVisibleChatTabs().isEmpty() || !expanded || chatScale == 0) return new int[]{hoveredTab, tabScroll};
         
         int height = 13;
         int x = 0;
@@ -22,12 +23,12 @@ public class FabricChatHudOverlays {
         int scrollerWidth = client.font.width("<") + 4;
         int tabNum = 0;
         boolean hovered = (mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height) && !(client.screen instanceof EditChatScreen);
-        context.fill(x, y, x + width, y + height, hovered ? FabricConfig.getConfig().getConfig().bgColorHovered.getRGB() : FabricConfig.getConfig().getConfig().bgColor.getRGB());
-        context.text(client.font, "MC", x + 2, y + 2, -1, FabricConfig.getConfig().getConfig().textShadow);
-        if(FabricConfig.getConfig().getConfig().selectedTab == tabNum) {
-            context.fill(x, y - 1, x + width, y, FabricConfig.getConfig().getConfig().selectedTabColor.getRGB());
+        context.fill(x, y, x + width, y + height, hovered ? config.getConfig().bgColorHovered.getRGB() : config.getConfig().bgColor.getRGB());
+        context.text(client.font, "MC", x + 2, y + 2, -1, config.getConfig().textShadow);
+        if(config.getConfig().selectedTab == tabNum) {
+            context.fill(x, y - 1, x + width, y, config.getConfig().selectedTabColor.getRGB());
         } else if(mcTabUnreads) {
-            context.fill(x, y - 1, x + width, y, FabricConfig.getConfig().getConfig().unreadColor.getRGB());
+            context.fill(x, y - 1, x + width, y, config.getConfig().unreadColor.getRGB());
         }
         if(hovered) {
             hoveredTab = tabNum;
@@ -36,15 +37,15 @@ public class FabricChatHudOverlays {
         x += width;
         if(tabScroll > -1) {
             hovered = (mouseX >= x && mouseX < x + scrollerWidth && mouseY >= y && mouseY < y + height) && !(client.screen instanceof EditChatScreen);
-            context.fill(x, y, x + scrollerWidth, y + height, hovered ? FabricConfig.getConfig().getConfig().bgColorHovered.getRGB() : FabricConfig.getConfig().getConfig().bgColor.getRGB());
-            context.text(client.font, "<", x + 2, y + 2, -1, FabricConfig.getConfig().getConfig().textShadow);
+            context.fill(x, y, x + scrollerWidth, y + height, hovered ? config.getConfig().bgColorHovered.getRGB() : config.getConfig().bgColor.getRGB());
+            context.text(client.font, "<", x + 2, y + 2, -1, config.getConfig().textShadow);
             if(hovered) {
                 hoveredTab = -2;
             }
             x += scrollerWidth;
         }
         boolean shouldScrollTabs = false;
-        for(ChatTab tab : FabricConfig.getConfig().getConfig().getVisibleChatTabs()) {
+        for(ChatTab tab : config.getConfig().getVisibleChatTabs()) {
             if(tabNum < tabScroll + 1) {
                 tabNum++;
                 shouldScrollTabs = true;
@@ -54,21 +55,21 @@ public class FabricChatHudOverlays {
             if(x + width > chatWidth - scrollerWidth) {
                 shouldScrollTabs = true;
                 hovered = (mouseX >= chatWidth - scrollerWidth && mouseX < chatWidth && mouseY >= y && mouseY < y + height) && !(client.screen instanceof EditChatScreen);
-                context.fill(chatWidth - scrollerWidth, y, chatWidth, y + height, hovered ? FabricConfig.getConfig().getConfig().bgColorHovered.getRGB() : FabricConfig.getConfig().getConfig().bgColor.getRGB());
-                context.fill(x, y, chatWidth - scrollerWidth, y + height, FabricConfig.getConfig().getConfig().bgColor.getRGB());
-                context.text(client.font, ">", chatWidth - scrollerWidth + 2, y + 2, -1, FabricConfig.getConfig().getConfig().textShadow);
+                context.fill(chatWidth - scrollerWidth, y, chatWidth, y + height, hovered ? config.getConfig().bgColorHovered.getRGB() : config.getConfig().bgColor.getRGB());
+                context.fill(x, y, chatWidth - scrollerWidth, y + height, config.getConfig().bgColor.getRGB());
+                context.text(client.font, ">", chatWidth - scrollerWidth + 2, y + 2, -1, config.getConfig().textShadow);
                 if(hovered) {
                     hoveredTab = -3;
                 }
                 break;
             }
             hovered = (mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height) && !(client.screen instanceof EditChatScreen);
-            context.fill(x, y, x + width, y + height, hovered ? FabricConfig.getConfig().getConfig().bgColorHovered.getRGB() : FabricConfig.getConfig().getConfig().bgColor.getRGB());
-            context.text(client.font, tab.getName(), x + 2, y + 2, -1, FabricConfig.getConfig().getConfig().textShadow);
-            if(FabricConfig.getConfig().getConfig().selectedTab == tabNum) {
-                context.fill(x, y - 1, x + width, y, FabricConfig.getConfig().getConfig().selectedTabColor.getRGB());
+            context.fill(x, y, x + width, y + height, hovered ? config.getConfig().bgColorHovered.getRGB() : config.getConfig().bgColor.getRGB());
+            context.text(client.font, tab.getName(), x + 2, y + 2, -1, config.getConfig().textShadow);
+            if(config.getConfig().selectedTab == tabNum) {
+                context.fill(x, y - 1, x + width, y, config.getConfig().selectedTabColor.getRGB());
             } else if(tab.hasUnreads()) {
-                context.fill(x, y - 1, x + width, y, FabricConfig.getConfig().getConfig().unreadColor.getRGB());
+                context.fill(x, y - 1, x + width, y, config.getConfig().unreadColor.getRGB());
             }
             if(hovered) {
                 hoveredTab = tabNum;

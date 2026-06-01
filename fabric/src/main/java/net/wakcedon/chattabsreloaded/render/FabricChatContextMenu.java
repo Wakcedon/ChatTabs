@@ -23,9 +23,12 @@ public class FabricChatContextMenu {
     
     private final List<Element> elements = new ArrayList<>();
     
-    public FabricChatContextMenu(int x, int y, Element... elements) {
+    private final FabricConfig config;
+    
+    public FabricChatContextMenu(int x, int y, FabricConfig config, Element... elements) {
         this.x = x;
         this.y = y;
+        this.config = config;
         this.elements.addAll(List.of(elements));
     }
     
@@ -55,7 +58,7 @@ public class FabricChatContextMenu {
                 boolean hovered = mouseX >= x && mouseY >= ey && mouseX < x + this.width && mouseY < ey + ELEMENT_HEIGHT;
                 if(hovered) context.requestCursor(CursorTypes.POINTING_HAND);
                 context.fill(x, ey, x + this.width, ey + ELEMENT_HEIGHT, hovered ? 0x80FFFFFF : 0x80000000);
-                context.text(client.font, element.text(), x + 2, ey + 2, -1, FabricConfig.getConfig().getConfig().textShadow);
+                context.text(client.font, element.text(), x + 2, ey + 2, -1, config.getConfig().textShadow);
                 ey += ELEMENT_HEIGHT;
             }
         }

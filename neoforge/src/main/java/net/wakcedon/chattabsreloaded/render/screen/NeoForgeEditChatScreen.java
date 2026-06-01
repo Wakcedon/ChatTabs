@@ -43,9 +43,12 @@ public class NeoForgeEditChatScreen extends Screen {
     // -1 - not dragging, 0 - drag height, 1 - drag width
     private int dragging = -1;
     
+    private final NeoForgeConfig config;
+    
     public NeoForgeEditChatScreen(Screen parent) {
         super(Component.translatable("chattabs.editchatscreen"));
         this.parent = parent;
+        this.config = NeoForgeMod.getConfig();
         editFocusedWidget = Checkbox.builder(Component.translatable("chattabs.editchatscreen.editfocused"), font)
                 .pos(4, height - 30)
                 .selected(true)
@@ -59,8 +62,8 @@ public class NeoForgeEditChatScreen extends Screen {
         addRenderableWidget(editFocusedWidget);
         
         int lineHeight = (int)(9 * (minecraft.options.chatLineSpacing().get() + 1));
-        NeoForgeMod.getConfig().getConfig().chatHeightFocused = (NeoForgeMod.getConfig().getConfig().chatHeightFocused / lineHeight) * lineHeight;
-        NeoForgeMod.getConfig().getConfig().chatHeightUnfocused = (NeoForgeMod.getConfig().getConfig().chatHeightUnfocused / lineHeight) * lineHeight;
+        config.getConfig().chatHeightFocused = (config.getConfig().chatHeightFocused / lineHeight) * lineHeight;
+        config.getConfig().chatHeightUnfocused = (config.getConfig().chatHeightUnfocused / lineHeight) * lineHeight;
     }
     
     @Override
@@ -71,9 +74,9 @@ public class NeoForgeEditChatScreen extends Screen {
         
         context.pose().pushMatrix();
         
-        int chatWidth = NeoForgeMod.getConfig().getConfig().chatWidth + (int)(12 * minecraft.options.chatScale().get());
+        int chatWidth = config.getConfig().chatWidth + (int)(12 * minecraft.options.chatScale().get());
         int chatY = height - 41;
-        int chatHeight = (editFocusedWidget.selected() ? NeoForgeMod.getConfig().getConfig().chatHeightFocused : NeoForgeMod.getConfig().getConfig().chatHeightUnfocused);
+        int chatHeight = (editFocusedWidget.selected() ? config.getConfig().chatHeightFocused : config.getConfig().chatHeightUnfocused);
         int chatVisualHeight = (int)(chatHeight * minecraft.options.chatScale().get());
         // top edge
         context.horizontalLine(0, chatWidth, chatY - chatVisualHeight, fade(-1, topEdgeTicks));
@@ -110,9 +113,9 @@ public class NeoForgeEditChatScreen extends Screen {
     @Override
     public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
         if(minecraft.options.chatScale().get() == 0) return super.mouseClicked(click, doubled);
-        int chatWidth = NeoForgeMod.getConfig().getConfig().chatWidth + 12;
+        int chatWidth = config.getConfig().chatWidth + 12;
         int chatY = height - 41;
-        int chatHeight = (editFocusedWidget.selected() ? NeoForgeMod.getConfig().getConfig().chatHeightFocused : NeoForgeMod.getConfig().getConfig().chatHeightUnfocused);
+        int chatHeight = (editFocusedWidget.selected() ? config.getConfig().chatHeightFocused : config.getConfig().chatHeightUnfocused);
         int chatVisualHeight = (int)(chatHeight * minecraft.options.chatScale().get());
         if(click.x() >= 0 && click.x() < chatWidth && click.y() >= chatY - chatVisualHeight - 3 && click.y() < chatY - chatVisualHeight + 3) {
             dragging = 0;
@@ -137,13 +140,13 @@ public class NeoForgeEditChatScreen extends Screen {
         if(dragging == 0) {
             int lineHeight = (int)(9 * (minecraft.options.chatLineSpacing().get() + 1));
             if(editFocusedWidget.selected()) {
-                NeoForgeMod.getConfig().getConfig().chatHeightFocused = (Math.clamp(dragStartHeight + (int)(dragStartY - (click.y() / minecraft.options.chatScale().get())), 20, 900) / lineHeight) * lineHeight;
+                config.getConfig().chatHeightFocused = (Math.clamp(dragStartHeight + (int)(dragStartY - (click.y() / minecraft.options.chatScale().get())), 20, 900) / lineHeight) * lineHeight;
             } else {
-                NeoForgeMod.getConfig().getConfig().chatHeightUnfocused = (Math.clamp(dragStartHeight + (int)(dragStartY - (click.y() / minecraft.options.chatScale().get())), 20, 900) / lineHeight) * lineHeight;
+                config.getConfig().chatHeightUnfocused = (Math.clamp(dragStartHeight + (int)(dragStartY - (click.y() / minecraft.options.chatScale().get())), 20, 900) / lineHeight) * lineHeight;
             }
             return true;
         } else if(dragging == 1) {
-            NeoForgeMod.getConfig().getConfig().chatWidth = Math.max(dragStartWidth - (int)(dragStartX - click.x()), 40);
+            config.getConfig().chatWidth = Math.max(dragStartWidth - (int)(dragStartX - click.x()), 40);
             return true;
         } else {
             return super.mouseDragged(click, offsetX, offsetY);

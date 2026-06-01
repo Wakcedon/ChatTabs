@@ -43,9 +43,12 @@ public class FabricEditChatScreen extends Screen {
     // -1 - not dragging, 0 - drag height, 1 - drag width
     private int dragging = -1;
     
+    private final FabricConfig config;
+    
     public FabricEditChatScreen(Screen parent) {
         super(Component.translatable("chattabs.editchatscreen"));
         this.parent = parent;
+        this.config = FabricConfig.getConfig();
         editFocusedWidget = Checkbox.builder(Component.translatable("chattabs.editchatscreen.editfocused"), font)
                 .pos(4, height - 30)
                 .selected(true)
@@ -59,8 +62,8 @@ public class FabricEditChatScreen extends Screen {
         addRenderableWidget(editFocusedWidget);
         
         int lineHeight = (int)(9 * (minecraft.options.chatLineSpacing().get() + 1));
-        FabricConfig.getConfig().getConfig().chatHeightFocused = (FabricConfig.getConfig().getConfig().chatHeightFocused / lineHeight) * lineHeight;
-        FabricConfig.getConfig().getConfig().chatHeightUnfocused = (FabricConfig.getConfig().getConfig().chatHeightUnfocused / lineHeight) * lineHeight;
+        config.getConfig().chatHeightFocused = (config.getConfig().chatHeightFocused / lineHeight) * lineHeight;
+        config.getConfig().chatHeightUnfocused = (config.getConfig().chatHeightUnfocused / lineHeight) * lineHeight;
     }
     
     @Override
@@ -71,9 +74,9 @@ public class FabricEditChatScreen extends Screen {
         
         context.pose().pushMatrix();
         
-        int chatWidth = FabricConfig.getConfig().getConfig().chatWidth + (int)(12 * minecraft.options.chatScale().get());
+        int chatWidth = config.getConfig().chatWidth + (int)(12 * minecraft.options.chatScale().get());
         int chatY = height - 41;
-        int chatHeight = (editFocusedWidget.selected() ? FabricConfig.getConfig().getConfig().chatHeightFocused : FabricConfig.getConfig().getConfig().chatHeightUnfocused);
+        int chatHeight = (editFocusedWidget.selected() ? config.getConfig().chatHeightFocused : config.getConfig().chatHeightUnfocused);
         int chatVisualHeight = (int)(chatHeight * minecraft.options.chatScale().get());
         // top edge
         context.horizontalLine(0, chatWidth, chatY - chatVisualHeight, fade(-1, topEdgeTicks));
@@ -110,9 +113,9 @@ public class FabricEditChatScreen extends Screen {
     @Override
     public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
         if(minecraft.options.chatScale().get() == 0) return super.mouseClicked(click, doubled);
-        int chatWidth = FabricConfig.getConfig().getConfig().chatWidth + 12;
+        int chatWidth = config.getConfig().chatWidth + 12;
         int chatY = height - 41;
-        int chatHeight = (editFocusedWidget.selected() ? FabricConfig.getConfig().getConfig().chatHeightFocused : FabricConfig.getConfig().getConfig().chatHeightUnfocused);
+        int chatHeight = (editFocusedWidget.selected() ? config.getConfig().chatHeightFocused : config.getConfig().chatHeightUnfocused);
         int chatVisualHeight = (int)(chatHeight * minecraft.options.chatScale().get());
         if(click.x() >= 0 && click.x() < chatWidth && click.y() >= chatY - chatVisualHeight - 3 && click.y() < chatY - chatVisualHeight + 3) {
             dragging = 0;
@@ -137,13 +140,13 @@ public class FabricEditChatScreen extends Screen {
         if(dragging == 0) {
             int lineHeight = (int)(9 * (minecraft.options.chatLineSpacing().get() + 1));
             if(editFocusedWidget.selected()) {
-                FabricConfig.getConfig().getConfig().chatHeightFocused = (Math.clamp(dragStartHeight + (int)(dragStartY - (click.y() / minecraft.options.chatScale().get())), 20, 900) / lineHeight) * lineHeight;
+                config.getConfig().chatHeightFocused = (Math.clamp(dragStartHeight + (int)(dragStartY - (click.y() / minecraft.options.chatScale().get())), 20, 900) / lineHeight) * lineHeight;
             } else {
-                FabricConfig.getConfig().getConfig().chatHeightUnfocused = (Math.clamp(dragStartHeight + (int)(dragStartY - (click.y() / minecraft.options.chatScale().get())), 20, 900) / lineHeight) * lineHeight;
+                config.getConfig().chatHeightUnfocused = (Math.clamp(dragStartHeight + (int)(dragStartY - (click.y() / minecraft.options.chatScale().get())), 20, 900) / lineHeight) * lineHeight;
             }
             return true;
         } else if(dragging == 1) {
-            FabricConfig.getConfig().getConfig().chatWidth = Math.max(dragStartWidth - (int)(dragStartX - click.x()), 40);
+            config.getConfig().chatWidth = Math.max(dragStartWidth - (int)(dragStartX - click.x()), 40);
             return true;
         } else {
             return super.mouseDragged(click, offsetX, offsetY);

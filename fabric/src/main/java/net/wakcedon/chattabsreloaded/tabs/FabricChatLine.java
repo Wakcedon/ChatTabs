@@ -11,12 +11,12 @@ public class FabricChatLine implements ChatLine {
 
     @Override
     public String getContent() {
-        return line.content().getString();
+        return line.content().toString();
     }
 
     @Override
     public boolean isSystem() {
-        return line.content().getStyle().isItalic();
+        return false; // В Fabric нет прямого способа определить системное сообщение
     }
 
     public GuiMessage.Line getLine() {

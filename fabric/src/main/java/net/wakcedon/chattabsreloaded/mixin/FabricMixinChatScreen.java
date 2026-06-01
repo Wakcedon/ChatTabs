@@ -39,8 +39,9 @@ public abstract class FabricMixinChatScreen extends Screen {
     
     @Redirect(method = "handleChatInput", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendChat(Ljava/lang/String;)V"))
     private void modifyChatMessage(ClientPacketListener instance, String content) {
-        if(FabricConfig.getConfig().getConfig().enabled && FabricConfig.getConfig().getConfig().selectedTab > 0) {
-            content = FabricConfig.getConfig().getConfig().getSelectedChatTab().modifySend(content);
+        FabricConfig config = FabricConfig.getConfig();
+        if(config.getConfig().enabled && config.getConfig().selectedTab > 0) {
+            content = config.getConfig().getSelectedChatTab().modifySend(content);
             if (content.startsWith("/")) {
                 instance.sendCommand(content.substring(1));
             } else {

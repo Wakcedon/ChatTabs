@@ -12,8 +12,7 @@ public class FabricEntrypoint implements ModInitializer {
         ChatTabs.init();
         config = new FabricConfig();
         config.load();
-        // Set the max lines from config
-        ChatTabs.setMaxLines(config.getConfig().maxLines);
+        // Config is now loaded and accessible through getConfig()
     }
     
     public static FabricConfig getConfig() {

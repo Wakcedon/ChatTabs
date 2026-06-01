@@ -11,16 +11,18 @@ public interface NeoForgeMixinAlphaCalculator {
 
     @ModifyConstant(method = "lambda$timeBased$0", constant = @Constant(doubleValue = 200.0))
     private static double modifyMaxTimeTicks(double constant) {
-        if(NeoForgeMod.getConfig().getConfig().enabled) {
-            return NeoForgeMod.getConfig().getConfig().previewTime * 20;
+        NeoForgeConfig config = NeoForgeMod.getConfig();
+        if(config.getConfig().enabled) {
+            return config.getConfig().previewTime * 20;
         }
         return constant;
     }
     
     @ModifyConstant(method = "lambda$timeBased$0", constant = @Constant(doubleValue = 10.0))
     private static double modifyMaxTimeSeconds(double constant) {
-        if(NeoForgeMod.getConfig().getConfig().enabled) {
-            return NeoForgeMod.getConfig().getConfig().previewTime;
+        NeoForgeConfig config = NeoForgeMod.getConfig();
+        if(config.getConfig().enabled) {
+            return config.getConfig().previewTime;
         }
         return constant;
     }

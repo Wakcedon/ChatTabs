@@ -39,8 +39,9 @@ public abstract class NeoForgeMixinChatScreen extends Screen {
     
     @Redirect(method = "handleChatInput", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendChat(Ljava/lang/String;)V"))
     private void modifyChatMessage(ClientPacketListener instance, String content) {
-        if(NeoForgeMod.getConfig().getConfig().enabled && NeoForgeMod.getConfig().getConfig().selectedTab > 0) {
-            content = NeoForgeMod.getConfig().getConfig().getSelectedChatTab().modifySend(content);
+        NeoForgeConfig config = NeoForgeMod.getConfig();
+        if(config.getConfig().enabled && config.getConfig().selectedTab > 0) {
+            content = config.getConfig().getSelectedChatTab().modifySend(content);
             if (content.startsWith("/")) {
                 instance.sendCommand(content.substring(1));
             } else {

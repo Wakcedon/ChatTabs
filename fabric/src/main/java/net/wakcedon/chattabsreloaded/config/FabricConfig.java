@@ -22,7 +22,8 @@ public class FabricConfig implements PlatformConfig {
 
     public FabricConfig() {
         this.configPath = getConfigPath();
-        this.config = new ChatTabsConfigBase(this);
+        this.config = new ChatTabsConfigBase();
+        this.config.platformConfig = this;
     }
 
     @Override
@@ -39,7 +40,8 @@ public class FabricConfig implements PlatformConfig {
             }
         } catch (Throwable ignored) {
         }
-        this.config = new ChatTabsConfigBase(this);
+        this.config = new ChatTabsConfigBase();
+        this.config.platformConfig = this;
     }
 
     @Override

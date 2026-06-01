@@ -76,6 +76,8 @@ public class ChatTabsConfigBase {
     @Expose
     public List<ServerProfile> serverProfiles = new ArrayList<>();
 
+    public PlatformConfig platformConfig;
+
     public List<ChatTab> getVisibleChatTabs() {
         // Базовая реализация без платформо-специфичной логики
         return chatTabs.stream().filter(ChatTab::isVisibleByDefault).toList();
