@@ -36,6 +36,8 @@ sourceSets {
     main {
         java {
             srcDir project(':').sourceSets.main.java.srcDirs
+            // Exclude Fabric‑specific source files from the NeoForge compilation
+            exclude 'net/wakcedon/chattabsreloaded/fabric/**'
         }
     }
 }
