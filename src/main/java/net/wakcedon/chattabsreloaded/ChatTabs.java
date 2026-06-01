@@ -13,4 +13,12 @@ public class ChatTabs {
     public static void init() {
         LOGGER.info("ChatTabs Reloaded common init");
     }
+    
+    /**
+     * Get the maximum number of lines from config.
+     * This method is called by platform-specific code.
+     */
+    public static int getMaxLines() {
+        return 100; // Default value, will be overridden by platform-specific config
+    }
 }

@@ -1,13 +1,12 @@
 package net.wakcedon.chattabsreloaded.tabs;
 
 import com.google.gson.annotations.Expose;
-import net.wakcedon.chattabsreloaded.config.ChatTabsConfig;
+import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import org.apache.commons.compress.utils.Lists;
 
 import java.util.LinkedList;
 import java.util.Deque;
 import java.util.List;
-import net.minecraft.client.multiplayer.chat.GuiMessage;
 
 public class ChatTab {
     
@@ -25,10 +24,10 @@ public class ChatTab {
     @Expose
     private SendModifier sendModifier;
     
-    private final LinkedList<GuiMessage.Line> visibleLines = new LinkedList<>();
+    private final Deque<ChatLine> visibleLines = Lists.newLinkedList();
     
     private boolean firstMessageUnread = true;
-    private GuiMessage.Line lastSeenLine;
+    private ChatLine lastSeenLine;
     
     public ChatTab(String id, String name, boolean save, boolean visibleByDefault, ChatLineFilter filter, SendModifier sendModifier) {
         this.id = id;
@@ -95,13 +94,13 @@ public class ChatTab {
         return sendModifier;
     }
     
-    public List<GuiMessage> filterChat(List<GuiMessage> chatLines) {
-        return filter.filterChat(chatLines);
+    public List<ChatMessageList> filterChat(List<ChatMessageList> chatLists) {
+        return filter.filterChat(chatLists);
     }
     
-    public void addChatLine(GuiMessage.Line line) {
+    public void addChatLine(ChatLine line) {
         visibleLines.addFirst(line);
-        while(visibleLines.size() > ChatTabsConfig.getInstance().maxLines) {
+        while(visibleLines.size() > net.wakcedon.chattabsreloaded.ChatTabs.getMaxLines()) {
             visibleLines.removeLast();
         }
     }
@@ -118,7 +117,7 @@ public class ChatTab {
         }
     }
     
-    public List<GuiMessage.Line> getVisibleChatLines() {
+    public List<ChatLine> getVisibleChatLines() {
         return List.copyOf(visibleLines);
     }
     
@@ -134,10 +133,26 @@ public class ChatTab {
     public int getLastSeenMessage() {
         if(firstMessageUnread) return visibleLines.size() - 1;
         if(lastSeenLine == null) return 0;
-        return visibleLines.indexOf(lastSeenLine);
+        int index = 0;
+        for(ChatLine line : visibleLines) {
+            if(line.equals(lastSeenLine)) {
+                return index;
+            }
+            index++;
+        }
+        return 0;
     }
     
     public boolean hasUnreads() {
-        return (lastSeenLine != null && visibleLines.indexOf(lastSeenLine) > 0) || (!visibleLines.isEmpty() && firstMessageUnread);
+        if(lastSeenLine != null) {
+            int seenIndex = 0;
+            for(ChatLine line : visibleLines) {
+                if(line.equals(lastSeenLine)) {
+                    return seenIndex > 0;
+                }
+                seenIndex++;
+            }
+        }
+        return !visibleLines.isEmpty() && firstMessageUnread;
     }
 }

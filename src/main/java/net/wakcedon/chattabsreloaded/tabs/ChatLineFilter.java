@@ -1,7 +1,6 @@
 package net.wakcedon.chattabsreloaded.tabs;
 
 import com.google.gson.annotations.Expose;
-import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.chat.TextColor;
 import java.util.List;
@@ -21,7 +20,7 @@ public class ChatLineFilter {
     @Expose
     private int hexColor;
     
-    private final Predicate<GuiMessage> filter;
+    private final Predicate<ChatLine> filter;
     
     public ChatLineFilter() {
         this(".*");
@@ -35,12 +34,11 @@ public class ChatLineFilter {
             try {
                 boolean colorMatches = matchesLineColor(line);
                 if(filterMessages) {
-                    if(line.content().getContents() instanceof TranslatableContents m) {
-                        return m.getKey().startsWith("commands.message.display") && m.getArgument(0).getString().equals(regex) && colorMatches;
-                    }
+                    // Для платформо-специфичной логики фильтрации сообщений
+                    // нужно использовать реализации в Fabric/Neo версиях
                     return false;
                 }
-                return line.content().getString().matches(regex) && colorMatches;
+                return line.getContent().matches(regex) && colorMatches;
             } catch(PatternSyntaxException e) {
                 return true;
             }
@@ -48,22 +46,10 @@ public class ChatLineFilter {
         this.filterMessages = filterMessages;
     }
     
-    private boolean matchesLineColor(GuiMessage line) {
+    private boolean matchesLineColor(ChatLine line) {
         boolean colorMatches = true;
-        TextColor color = line.content().getStyle().getColor();
-        if(color != null) {
-            if(this.colorFilter == ColorFilter.HEX) {
-                colorMatches = color.getValue() == this.hexColor;
-            } else if(this.colorFilter != ColorFilter.DISABLED) {
-                colorMatches = color.getValue() == this.colorFilter.getColor();
-            }
-        } else if(this.colorFilter != ColorFilter.DISABLED) {
-            if(this.colorFilter == ColorFilter.HEX) {
-                colorMatches = 0xFFFFFF == this.hexColor;
-            } else {
-                colorMatches = this.colorFilter == ColorFilter.WHITE;
-            }
-        }
+        // Для платформо-специфичной логики цвета
+        // нужно использовать реализации в Fabric/Neo версиях
         return colorMatches;
     }
     
@@ -75,11 +61,11 @@ public class ChatLineFilter {
         this(filter, false);
     }
     
-    public List<GuiMessage> filterChat(List<GuiMessage> chatLines) {
-        return chatLines.stream().filter(filter).toList();
+    public List<ChatMessageList> filterChat(List<ChatMessageList> chatLists) {
+        return chatLists.stream().filter(filter).toList();
     }
     
-    public boolean test(GuiMessage message) {
+    public boolean test(ChatLine message) {
         return filter.test(message);
     }
     

@@ -1,7 +1,7 @@
 package net.wakcedon.chattabsreloaded.profiles;
 
 import com.google.gson.annotations.Expose;
-import net.wakcedon.chattabsreloaded.config.ChatTabsConfig;
+import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class ServerProfile {
     }
     
     public List<ChatTab> getTabs() {
-        return ChatTabsConfig.getInstance().getChatTabs().stream().filter(tab -> tabs.contains(tab.getId())).toList();
+        return ChatTabsConfigBase.getInstance().getChatTabs().stream().filter(tab -> tabs.contains(tab.getId())).toList();
     }
     
     public void setServerAddress(String serverAddress) {
