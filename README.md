@@ -8,6 +8,8 @@ Features
 - Config GUI (Cloth/Cloth config integration)
 - Works on Fabric and NeoForge (separate artifacts)
 
+Authors: Wakcedon, Gri11edHam
+
 Building
 
 Requirements: JDK 17+ (project targets Java 25 via toolchain), Gradle wrapper

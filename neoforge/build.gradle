@@ -13,8 +13,6 @@ repositories {
 
 dependencies {
     implementation project(':')
-    // Forgified Fabric API helps bridge Fabric API calls on NeoForge
-    implementation "org.sinytra.forgified-fabric-api:forgified-fabric-api:${rootProject.forgified_fabric_api_version}"
 }
 
 neoForge {

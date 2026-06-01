@@ -6,3 +6,4 @@ modId="chattabs"
 version="${mod_version}"
 displayName="ChatTabs"
 description='''Adds customizable tabs to the chat screen'''
+authors = ["Wakcedon", "Gri11edHam"]

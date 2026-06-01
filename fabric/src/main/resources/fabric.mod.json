@@ -6,12 +6,13 @@
   "name": "ChatTabs",
   "description": "Adds customizable tabs to the chat screen",
   "authors": [
-    "GrilledHam"
+    "Wakcedon",
+    "Gri11edHam"
   ],
   "contact": {
     "homepage": "https://modrinth.com/mod/chat-tabs",
-    "sources": "https://github.com/Gri11edHam/ChatTabs",
-    "issues": "https://github.com/Gri11edHam/ChatTabs/issues"
+    "sources": "https://github.com/Wakcedon/ChatTabs",
+    "issues": "https://github.com/Wakcedon/ChatTabs/issues"
   },
 
   "license": "GPL-3.0",
