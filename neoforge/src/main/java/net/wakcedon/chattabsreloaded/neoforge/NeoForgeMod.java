@@ -1,7 +1,7 @@
 package net.wakcedon.chattabsreloaded.neoforge;
 
 import net.wakcedon.chattabsreloaded.ChatTabs;
-import net.fabricmc.fabric.api.mod.container.v1.ModContainer;
+import net.neoforged.fml.common.Mod;
 
 @Mod("chattabs-reloaded")
 public class NeoForgeMod {
