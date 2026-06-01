@@ -12,7 +12,8 @@ repositories {
 }
 
 dependencies {
-    implementation project(':')
+    // Use api to expose the common module to NeoForge compilation
+    api project(':')
 }
 
 def targetJavaVersion = 21
