@@ -4,7 +4,10 @@ import com.google.gson.annotations.Expose;
 import net.wakcedon.chattabsreloaded.config.ChatTabsConfig;
 import org.apache.commons.compress.utils.Lists;
 
+import java.util.LinkedList;
+import java.util.Deque;
 import java.util.List;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
 
 public class ChatTab {
     
@@ -22,7 +25,7 @@ public class ChatTab {
     @Expose
     private SendModifier sendModifier;
     
-    private final List<GuiMessage.Line> visibleLines = Lists.newArrayList();
+    private final LinkedList<GuiMessage.Line> visibleLines = new LinkedList<>();
     
     private boolean firstMessageUnread = true;
     private GuiMessage.Line lastSeenLine;
@@ -116,7 +119,7 @@ public class ChatTab {
     }
     
     public List<GuiMessage.Line> getVisibleChatLines() {
-        return visibleLines;
+        return List.copyOf(visibleLines);
     }
     
     public String modifySend(String msg) {

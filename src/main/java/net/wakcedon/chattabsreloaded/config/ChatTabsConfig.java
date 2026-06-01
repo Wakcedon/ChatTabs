@@ -80,6 +80,40 @@ public class ChatTabsConfig {
 
     private static ChatTabsConfig INSTANCE;
 
+    public static ChatTabsConfig getInstance() {
+        if (INSTANCE == null) {
+            try {
+                load();
+            } catch (Throwable t) {
+                INSTANCE = new ChatTabsConfig();
+            }
+        }
+        return INSTANCE;
+    }
+
+    public static void load() {
+        Path cfg = getConfigFile();
+        try {
+            if (Files.exists(cfg)) {
+                String json = Files.readString(cfg);
+                ChatTabsConfig cfgObj = GSON.fromJson(json, ChatTabsConfig.class);
+                if (cfgObj == null) cfgObj = new ChatTabsConfig();
+                INSTANCE = cfgObj;
+                return;
+            }
+        } catch (Throwable ignored) {}
+        INSTANCE = new ChatTabsConfig();
+    }
+
+    public static void save() {
+        try {
+            Path cfg = getConfigFile();
+            Files.createDirectories(cfg.getParent());
+            String json = GSON.toJson(getInstance());
+            Files.writeString(cfg, json, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+        } catch (IOException ignored) {}
+    }
+
     private static Path getConfigFile() {
         // Try FabricLoader via reflection when available
         try {

@@ -33,8 +33,10 @@ java {
 neoForge {
     version = rootProject.neoForge_version
     validateAccessTransformers = true
-    // Pull the access widener produced for Fabric and apply it for NeoForge runs
-    accessTransformers.from "../fabric/src/main/resources/chattabs.accesswidener"
+    // Note: Do not pass Fabric access widener directly to NeoForge access-transformer
+    // tooling — formats differ (accessWidener vs AT). If you need to apply an access
+    // widener for NeoForge, convert it to AT format or configure NeoForge-specific
+    // access transformers here. Skipping auto-apply to avoid parser errors in CI.
     mods {
         chattabs {
             sourceSet sourceSets.main
