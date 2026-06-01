@@ -31,6 +31,14 @@ java {
     }
 }
 // NeoForge module compiles only its own sources; common code is provided as a dependency.
+sourceSets {
+    main {
+        java {
+            // Include the common module's source directory so NeoForge can compile against shared classes like ChatTabs.
+            srcDir project(':').projectDir.resolve('src/main/java')
+        }
+    }
+}
 
 neoForge {
     version = rootProject.neoForge_version
