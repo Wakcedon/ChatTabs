@@ -35,7 +35,7 @@ sourceSets {
     main {
         java {
             // Include the common module's source directory so NeoForge can compile against shared classes like ChatTabs.
-            srcDir project(':').projectDir.resolve('src/main/java')
+            srcDir project(':').file('src/main/java')
         }
     }
 }
