@@ -31,6 +31,14 @@ java {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
 }
+// Include the common module's source files so NeoForge can see shared classes like ChatTabs
+sourceSets {
+    main {
+        java {
+            srcDir project(':').sourceSets.main.java.srcDirs
+        }
+    }
+}
 
 neoForge {
     version = rootProject.neoForge_version
