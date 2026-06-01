@@ -30,6 +30,18 @@ dependencies {
     implementation("com.terraformersmc:modmenu:${rootProject.modmenu_version}")
 }
 
+// Also compile shared sources from root project so Loom sees Minecraft mappings
+sourceSets {
+    main {
+        java {
+            srcDirs += project(':').file('src/main/java')
+        }
+        resources {
+            srcDirs += project(':').file('src/main/resources')
+        }
+    }
+}
+
 processResources {
     inputs.property "version", project.version
     inputs.property "minecraft_version", rootProject.minecraft_version

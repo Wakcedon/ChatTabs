@@ -2,8 +2,8 @@ modLoader="neoForge"
 loaderVersion="[21,22)"
 
 [[mods]]
-modId="chattabs"
+modId="chattabs-reloaded"
 version="${mod_version}"
-displayName="ChatTabs"
-description='''Adds customizable tabs to the chat screen'''
+displayName="ChatTabs Reloaded"
+description='''Adds customizable, user-configurable chat tabs and filters — ChatTabs Reloaded (fork by Wakcedon)'''
 authors = ["Wakcedon", "Gri11edHam"]

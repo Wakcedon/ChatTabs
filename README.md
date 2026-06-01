@@ -1,31 +1,44 @@
-# ChatTabs
+# ChatTabs Reloaded
 
-ChatTabs adds customizable tabs to the Minecraft chat UI.
+ChatTabs Reloaded is a fork and modern continuation of the original ChatTabs mod, maintained by Wakcedon with contributions from Gri11edHam.
 
-Features
-- Per-tab filters and send modifiers
-- Server-profile-based tab sets
-- Config GUI (Cloth/Cloth config integration)
-- Works on Fabric and NeoForge (separate artifacts)
+What it does
+- Adds configurable chat tabs to the Minecraft chat UI.
+- Per-tab message filters, color rules, and send modifiers (prefix/suffix).
+- Server profile support: different tab sets per server.
+- Config GUI (Fabric only, via Cloth Config) — NeoForge build does not require Cloth at runtime.
 
-Authors: Wakcedon, Gri11edHam
+Supported loaders and versions
+- Fabric: 1.21.x (Fabric Loader 0.18.x)
+- NeoForge: 1.21.x (NeoForge 21.x)
 
-Building
+Supported languages
+- English (default)
+- Russian (included)
 
-Requirements: JDK 17+ (project targets Java 25 via toolchain), Gradle wrapper
+Quick links
+- Russian README: [README.ru.md](README.ru.md)
+- Contributing guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+
+How the project is organized
+- `src/main/java` — shared, loader-agnostic code and data models.
+- `fabric/` — Fabric entrypoints, Cloth-config UI, mod metadata and Loom build.
+- `neoforge/` — NeoForge wrapper metadata and ModDevGradle build.
+
+Building locally
+Requirements: JDK 21 (recommended), Gradle wrapper
 
 To build both artifacts locally:
 
 ```bash
-./gradlew :fabric:build :neoforge:build
+./gradlew -Pci=true :fabric:build :neoforge:build --no-daemon --parallel
 ```
 
-Output
+Outputs
 - `fabric/build/libs/` — Fabric remapped mod JAR
 - `neoforge/build/libs/` — NeoForge mod JAR
 
-Notes
-- The project is organized as a root common library (shared code) and two
-  subprojects `fabric` and `neoforge` that provide loader-specific metadata and
-  entrypoints. The NeoForge build uses Forgified Fabric API to bridge Fabric
-  API usage where possible.
+Translations
+- Russian locale is included at `fabric/src/main/resources/assets/chattabs-reloaded/lang/ru_ru.json`.
+
+If you'd like to help translate or contribute, see CONTRIBUTING.md.

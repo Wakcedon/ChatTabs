@@ -23,6 +23,15 @@ repositories {
     mavenCentral()
 }
 
+// Root project should not attempt to compile Minecraft client/server classes.
+// Fabric subproject will compile shared sources with Loom's mappings available.
+tasks.withType(JavaCompile).configureEach {
+    if (project == rootProject) it.enabled = false
+}
+tasks.withType(org.gradle.language.jvm.tasks.ProcessResources).configureEach {
+    if (project == rootProject) it.enabled = false
+}
+
 def targetJavaVersion = 21
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"

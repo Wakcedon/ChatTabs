@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "id": "chattabs",
+  "id": "chattabs-reloaded",
   "version": "${version}",
 
-  "name": "ChatTabs",
-  "description": "Adds customizable tabs to the chat screen",
+  "name": "ChatTabs Reloaded",
+  "description": "Adds customizable, user-configurable chat tabs and filters — ChatTabs Reloaded (fork by Wakcedon)",
   "authors": [
     "Wakcedon",
     "Gri11edHam"
@@ -16,7 +16,7 @@
   },
 
   "license": "GPL-3.0",
-  "icon": "assets/chattabs/icon.png",
+  "icon": "assets/chattabs-reloaded/icon.png",
 
   "environment": "client",
   "entrypoints": {
