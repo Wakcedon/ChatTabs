@@ -33,8 +33,8 @@ public class ServerProfile {
     }
     
     public List<ChatTab> getTabs() {
-        if (ChatTabsConfigBase.platformConfig != null) {
-            return ((ChatTabsConfigBase) ChatTabsConfigBase.platformConfig).getChatTabs().stream().filter(tab -> tabs.contains(tab.getId())).toList();
+        if (ChatTabsConfigBase.getInstance() != null) {
+            return ChatTabsConfigBase.getInstance().getChatTabs().stream().filter(tab -> tabs.contains(tab.getId())).toList();
         }
         return new ArrayList<>();
     }

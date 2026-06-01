@@ -1,7 +1,7 @@
 package net.wakcedon.chattabsreloaded.render.screen;
 
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
-import net.wakcedon.chattabsreloaded.config.ChatTabsConfig;
+import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import net.wakcedon.chattabsreloaded.mixininterface.IChatHud;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Checkbox;
@@ -43,9 +43,12 @@ public class EditChatScreen extends Screen {
     // -1 - not dragging, 0 - drag height, 1 - drag width
     private int dragging = -1;
     
+    private final ChatTabsConfigBase config;
+    
     public EditChatScreen(Screen parent) {
         super(Component.translatable("chattabs.editchatscreen"));
         this.parent = parent;
+        this.config = ChatTabsConfigBase.getInstance();
         editFocusedWidget = Checkbox.builder(Component.translatable("chattabs.editchatscreen.editfocused"), font)
                 .pos(4, height - 30)
                 .selected(true)
@@ -59,8 +62,8 @@ public class EditChatScreen extends Screen {
         addRenderableWidget(editFocusedWidget);
         
         int lineHeight = (int)(9 * (minecraft.options.chatLineSpacing().get() + 1));
-        ChatTabsConfig.getInstance().chatHeightFocused = (ChatTabsConfig.getInstance().chatHeightFocused / lineHeight) * lineHeight;
-        ChatTabsConfig.getInstance().chatHeightUnfocused = (ChatTabsConfig.getInstance().chatHeightUnfocused / lineHeight) * lineHeight;
+        config.chatHeightFocused = (config.chatHeightFocused / lineHeight) * lineHeight;
+        config.chatHeightUnfocused = (config.chatHeightUnfocused / lineHeight) * lineHeight;
     }
     
     @Override
@@ -71,9 +74,9 @@ public class EditChatScreen extends Screen {
         
         context.pose().pushMatrix();
         
-        int chatWidth = ChatTabsConfig.getInstance().chatWidth + (int)(12 * minecraft.options.chatScale().get());
+        int chatWidth = config.chatWidth + (int)(12 * minecraft.options.chatScale().get());
         int chatY = height - 41;
-        int chatHeight = (editFocusedWidget.selected() ? ChatTabsConfig.getInstance().chatHeightFocused : ChatTabsConfig.getInstance().chatHeightUnfocused);
+        int chatHeight = (editFocusedWidget.selected() ? config.chatHeightFocused : config.chatHeightUnfocused);
         int chatVisualHeight = (int)(chatHeight * minecraft.options.chatScale().get());
         // top edge
         context.horizontalLine(0, chatWidth, chatY - chatVisualHeight, fade(-1, topEdgeTicks));
@@ -110,9 +113,9 @@ public class EditChatScreen extends Screen {
     @Override
     public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
         if(minecraft.options.chatScale().get() == 0) return super.mouseClicked(click, doubled);
-        int chatWidth = ChatTabsConfig.getInstance().chatWidth + 12;
+        int chatWidth = config.chatWidth + 12;
         int chatY = height - 41;
-        int chatHeight = (editFocusedWidget.selected() ? ChatTabsConfig.getInstance().chatHeightFocused : ChatTabsConfig.getInstance().chatHeightUnfocused);
+        int chatHeight = (editFocusedWidget.selected() ? config.chatHeightFocused : config.chatHeightUnfocused);
         int chatVisualHeight = (int)(chatHeight * minecraft.options.chatScale().get());
         if(click.x() >= 0 && click.x() < chatWidth && click.y() >= chatY - chatVisualHeight - 3 && click.y() < chatY - chatVisualHeight + 3) {
             dragging = 0;
@@ -137,13 +140,13 @@ public class EditChatScreen extends Screen {
         if(dragging == 0) {
             int lineHeight = (int)(9 * (minecraft.options.chatLineSpacing().get() + 1));
             if(editFocusedWidget.selected()) {
-                ChatTabsConfig.getInstance().chatHeightFocused = (Math.clamp(dragStartHeight + (int)(dragStartY - (click.y() / minecraft.options.chatScale().get())), 20, 900) / lineHeight) * lineHeight;
+                config.chatHeightFocused = (Math.clamp(dragStartHeight + (int)(dragStartY - (click.y() / minecraft.options.chatScale().get())), 20, 900) / lineHeight) * lineHeight;
             } else {
-                ChatTabsConfig.getInstance().chatHeightUnfocused = (Math.clamp(dragStartHeight + (int)(dragStartY - (click.y() / minecraft.options.chatScale().get())), 20, 900) / lineHeight) * lineHeight;
+                config.chatHeightUnfocused = (Math.clamp(dragStartHeight + (int)(dragStartY - (click.y() / minecraft.options.chatScale().get())), 20, 900) / lineHeight) * lineHeight;
             }
             return true;
         } else if(dragging == 1) {
-            ChatTabsConfig.getInstance().chatWidth = Math.max(dragStartWidth - (int)(dragStartX - click.x()), 40);
+            config.chatWidth = Math.max(dragStartWidth - (int)(dragStartX - click.x()), 40);
             return true;
         } else {
             return super.mouseDragged(click, offsetX, offsetY);

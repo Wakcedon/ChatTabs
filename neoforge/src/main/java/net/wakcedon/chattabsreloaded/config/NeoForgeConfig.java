@@ -21,7 +21,7 @@ public class NeoForgeConfig implements PlatformConfig {
     private ChatTabsConfigBase config;
 
     public NeoForgeConfig() {
-        this.configPath = getConfigPath();
+        this.configPath = Path.of(getConfigPath());
         this.config = new ChatTabsConfigBase();
         this.config.platformConfig = this;
     }

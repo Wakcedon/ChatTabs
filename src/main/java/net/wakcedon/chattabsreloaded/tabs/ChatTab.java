@@ -2,10 +2,9 @@ package net.wakcedon.chattabsreloaded.tabs;
 
 import com.google.gson.annotations.Expose;
 import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
-import org.apache.commons.compress.utils.Lists;
 
-import java.util.LinkedList;
 import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ChatTab {
@@ -24,7 +23,7 @@ public class ChatTab {
     @Expose
     private SendModifier sendModifier;
     
-    private final Deque<ChatLine> visibleLines = Lists.newLinkedList();
+    private final Deque<ChatLine> visibleLines = new LinkedList<>();
     
     private boolean firstMessageUnread = true;
     private ChatLine lastSeenLine;

@@ -1,6 +1,6 @@
 package net.wakcedon.chattabsreloaded.mixin;
 
-import net.wakcedon.chattabsreloaded.config.ChatTabsConfig;
+import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import net.wakcedon.chattabsreloaded.mixininterface.IChatHud;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
@@ -39,8 +39,8 @@ public abstract class MixinChatScreen extends Screen {
     
     @Redirect(method = "handleChatInput", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendChat(Ljava/lang/String;)V"))
     private void modifyChatMessage(ClientPacketListener instance, String content) {
-        if(ChatTabsConfig.getInstance().enabled && ChatTabsConfig.getInstance().selectedTab > 0) {
-            content = ChatTabsConfig.getInstance().getSelectedChatTab().modifySend(content);
+        if(ChatTabsConfigBase.getInstance().enabled && ChatTabsConfigBase.getInstance().selectedTab > 0) {
+            content = ChatTabsConfigBase.getInstance().getSelectedChatTab().modifySend(content);
             if (content.startsWith("/")) {
                 instance.sendCommand(content.substring(1));
             } else {

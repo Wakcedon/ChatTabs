@@ -1,6 +1,6 @@
 package net.wakcedon.chattabsreloaded.mixin;
 
-import net.wakcedon.chattabsreloaded.config.NeoForgeConfig;
+import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import net.wakcedon.chattabsreloaded.mixininterface.IChatHud;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
@@ -39,9 +39,9 @@ public abstract class NeoForgeMixinChatScreen extends Screen {
     
     @Redirect(method = "handleChatInput", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendChat(Ljava/lang/String;)V"))
     private void modifyChatMessage(ClientPacketListener instance, String content) {
-        NeoForgeConfig config = NeoForgeMod.getConfig();
-        if(config.getConfig().enabled && config.getConfig().selectedTab > 0) {
-            content = config.getConfig().getSelectedChatTab().modifySend(content);
+        ChatTabsConfigBase config = NeoForgeMod.getConfig().getConfig();
+        if(config.enabled && config.selectedTab > 0) {
+            content = config.getSelectedChatTab().modifySend(content);
             if (content.startsWith("/")) {
                 instance.sendCommand(content.substring(1));
             } else {

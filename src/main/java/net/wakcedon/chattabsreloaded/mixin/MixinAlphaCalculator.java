@@ -1,6 +1,6 @@
 package net.wakcedon.chattabsreloaded.mixin;
 
-import net.wakcedon.chattabsreloaded.config.ChatTabsConfig;
+import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import net.minecraft.client.gui.components.ChatComponent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -11,16 +11,16 @@ public interface MixinAlphaCalculator {
 
     @ModifyConstant(method = "lambda$timeBased$0", constant = @Constant(doubleValue = 200.0))
     private static double modifyMaxTimeTicks(double constant) {
-        if(ChatTabsConfig.getInstance().enabled) {
-            return ChatTabsConfig.getInstance().previewTime * 20;
+        if(ChatTabsConfigBase.getInstance().enabled) {
+            return ChatTabsConfigBase.getInstance().previewTime * 20;
         }
         return constant;
     }
     
     @ModifyConstant(method = "lambda$timeBased$0", constant = @Constant(doubleValue = 10.0))
     private static double modifyMaxTimeSeconds(double constant) {
-        if(ChatTabsConfig.getInstance().enabled) {
-            return ChatTabsConfig.getInstance().previewTime;
+        if(ChatTabsConfigBase.getInstance().enabled) {
+            return ChatTabsConfigBase.getInstance().previewTime;
         }
         return constant;
     }

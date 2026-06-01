@@ -1,7 +1,7 @@
 package net.wakcedon.chattabsreloaded.render;
 
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
-import net.wakcedon.chattabsreloaded.config.ChatTabsConfig;
+import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -23,9 +23,12 @@ public class ChatContextMenu {
     
     private final List<Element> elements = new ArrayList<>();
     
-    public ChatContextMenu(int x, int y, Element... elements) {
+    private final ChatTabsConfigBase config;
+    
+    public ChatContextMenu(int x, int y, ChatTabsConfigBase config, Element... elements) {
         this.x = x;
         this.y = y;
+        this.config = config;
         this.elements.addAll(List.of(elements));
     }
     
@@ -55,7 +58,7 @@ public class ChatContextMenu {
                 boolean hovered = mouseX >= x && mouseY >= ey && mouseX < x + this.width && mouseY < ey + ELEMENT_HEIGHT;
                 if(hovered) context.requestCursor(CursorTypes.POINTING_HAND);
                 context.fill(x, ey, x + this.width, ey + ELEMENT_HEIGHT, hovered ? 0x80FFFFFF : 0x80000000);
-                context.text(client.font, element.text(), x + 2, ey + 2, -1, ChatTabsConfig.getInstance().textShadow);
+                context.text(client.font, element.text(), x + 2, ey + 2, -1, config.textShadow);
                 ey += ELEMENT_HEIGHT;
             }
         }
