@@ -34,6 +34,7 @@ repositories {
 
 dependencies {
     minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+    mappings loom.officialMojangMappings()
     implementation project(':')
     implementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
