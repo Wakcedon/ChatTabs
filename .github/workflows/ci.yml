@@ -18,12 +18,11 @@ jobs:
           java-version: '25'
       - name: Grant execute
         run: chmod +x gradlew
-      - name: Build Fabric and NeoForge
-        run: ./gradlew -Pci=true :fabric:build :neoforge:build --no-daemon --parallel
+      - name: Build NeoForge
+        run: ./gradlew -Pci=true :neoforge:build --no-daemon
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: chattabs-artifacts
           path: |
-            fabric/build/libs/*.jar
             neoforge/build/libs/*.jar

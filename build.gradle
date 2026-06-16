@@ -11,20 +11,11 @@ base {
 }
 
 repositories {
-    maven {
-        name 'Shedaniel Maven'
-        url 'https://maven.shedaniel.me/'
-    }
-    maven {
-        name 'Terraformers'
-        url 'https://maven.terraformersmc.com/'
-    }
-    maven { url 'https://maven.fabricmc.net/' }
     mavenCentral()
 }
 
 // Root project should not attempt to compile Minecraft client/server classes.
-// Fabric subproject will compile shared sources with Loom's mappings available.
+// NeoForge subproject will compile shared sources.
 tasks.withType(JavaCompile).configureEach {
     if (project == rootProject) it.enabled = false
 }
@@ -65,8 +56,4 @@ publishing {
 }
 
 dependencies {
-    // compile-time only dependencies to allow the common module to compile
-    compileOnly "net.fabricmc:fabric-loader:${project.loader_version}"
-    // Keep common module minimal — Fabric API, Cloth and ModMenu are fabric-specific and
-    // are provided in the `fabric` subproject.
 }

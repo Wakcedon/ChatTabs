@@ -1,8 +1,0 @@
-accessWidener v2 official
-
-accessible class net/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess
-accessible class net/minecraft/client/gui/components/ChatComponent$DrawingBackgroundGraphicsAccess
-accessible class net/minecraft/client/gui/components/ChatComponent$DrawingFocusedGraphicsAccess
-accessible class net/minecraft/client/gui/components/ChatComponent$ClickableTextOnlyGraphicsAccess
-accessible class net/minecraft/client/gui/components/ChatComponent$LineConsumer
-accessible class net/minecraft/client/gui/components/ChatComponent$AlphaCalculator
