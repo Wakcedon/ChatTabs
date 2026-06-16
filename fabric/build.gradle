@@ -1,18 +1,7 @@
-buildscript {
-    repositories {
-        maven { url 'https://maven.fabricmc.net/' }
-        gradlePluginPortal()
-    }
-    dependencies {
-        classpath "net.fabricmc:fabric-loom:${rootProject.loom_version}"
-    }
-}
-
 plugins {
+    id 'fabric-loom' version '1.10.5'
     id 'maven-publish'
 }
-
-apply plugin: 'fabric-loom'
 
 version = rootProject.mod_version
 group = rootProject.maven_group
@@ -35,11 +24,8 @@ repositories {
 dependencies {
     minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
     mappings loom.officialMojangMappings()
-    implementation project(':')
-    implementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
-    implementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
-    // Cloth Config and ModMenu are fabric-only development/runtime mods.
-    // Mark them compileOnly so they are not required for the common/neoforge compilation.
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
     compileOnly("me.shedaniel.cloth:cloth-config-fabric:${rootProject.cloth_config_version}")
     compileOnly("com.terraformersmc:modmenu:${rootProject.modmenu_version}")
 }
