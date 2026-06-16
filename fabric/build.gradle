@@ -1,7 +1,18 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabricmc.net/' }
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath "net.fabricmc:fabric-loom:${rootProject.loom_version}"
+    }
+}
+
 plugins {
-    id 'net.fabricmc.fabric-loom'
     id 'maven-publish'
 }
+
+apply plugin: 'fabric-loom'
 
 version = rootProject.mod_version
 group = rootProject.maven_group
