@@ -3,7 +3,7 @@ package net.wakcedon.chattabsreloaded.render.screen;
 import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import net.wakcedon.chattabsreloaded.mixininterface.IChatHud;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Checkbox;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -11,7 +11,7 @@ public class EditChatScreen extends Screen {
     
     private final Screen parent;
     
-    private final Checkbox editFocusedWidget;
+    private boolean editFocused = true;
     
     private float topEdgeTicks = 0;
     private float rightEdgeTicks = 0;
@@ -31,15 +31,13 @@ public class EditChatScreen extends Screen {
         super(Component.translatable("chattabs.editchatscreen"));
         this.parent = parent;
         this.config = ChatTabsConfigBase.getInstance();
-        editFocusedWidget = new Checkbox(4, height - 30, font.width(Component.translatable("chattabs.editchatscreen.editfocused")) + 28, 20, Component.translatable("chattabs.editchatscreen.editfocused"), font, true, (checkbox, newValue) -> {});
-        addRenderableWidget(editFocusedWidget);
+        addRenderableWidget(Button.builder(Component.translatable("chattabs.editchatscreen.editfocused"), button -> editFocused = !editFocused)
+                .bounds(4, height - 30, font.width(Component.translatable("chattabs.editchatscreen.editfocused")) + 28, 20)
+                .build());
     }
     
     @Override
     protected void init() {
-        editFocusedWidget.setPosition(4, height - 30);
-        addRenderableWidget(editFocusedWidget);
-        
         int lineHeight = (int)(9 * (minecraft.options.chatLineSpacing().get() + 1));
         config.chatHeightFocused = (config.chatHeightFocused / lineHeight) * lineHeight;
         config.chatHeightUnfocused = (config.chatHeightUnfocused / lineHeight) * lineHeight;
@@ -47,14 +45,14 @@ public class EditChatScreen extends Screen {
     
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
-        ((IChatHud)minecraft.gui.getChat()).chatTabs$renderDummy(context, this.font, this.minecraft.gui.getGuiTicks(), mouseX, mouseY, editFocusedWidget.selected());
+        ((IChatHud)minecraft.gui.getChat()).chatTabs$renderDummy(context, this.font, this.minecraft.gui.getGuiTicks(), mouseX, mouseY, editFocused);
         super.render(context, mouseX, mouseY, deltaTicks);
         
         context.pose().pushPose();
         
         int chatWidth = config.chatWidth + (int)(12 * minecraft.options.chatScale().get());
         int chatY = height - 41;
-        int chatHeight = (editFocusedWidget.selected() ? config.chatHeightFocused : config.chatHeightUnfocused);
+        int chatHeight = (editFocused ? config.chatHeightFocused : config.chatHeightUnfocused);
         int chatVisualHeight = (int)(chatHeight * minecraft.options.chatScale().get());
         // top edge
         context.hLine(0, chatWidth, chatY - chatVisualHeight, fade(-1, topEdgeTicks));
@@ -91,7 +89,7 @@ public class EditChatScreen extends Screen {
         if(minecraft.options.chatScale().get() == 0) return super.mouseClicked(mouseX, mouseY, button);
         int chatWidth = config.chatWidth + 12;
         int chatY = height - 41;
-        int chatHeight = (editFocusedWidget.selected() ? config.chatHeightFocused : config.chatHeightUnfocused);
+        int chatHeight = (editFocused ? config.chatHeightFocused : config.chatHeightUnfocused);
         int chatVisualHeight = (int)(chatHeight * minecraft.options.chatScale().get());
         if(mouseX >= 0 && mouseX < chatWidth && mouseY >= chatY - chatVisualHeight - 3 && mouseY < chatY - chatVisualHeight + 3) {
             dragging = 0;
@@ -115,7 +113,7 @@ public class EditChatScreen extends Screen {
         if(minecraft.options.chatScale().get() == 0) return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
         if(dragging == 0) {
             int lineHeight = (int)(9 * (minecraft.options.chatLineSpacing().get() + 1));
-            if(editFocusedWidget.selected()) {
+            if(editFocused) {
                 config.chatHeightFocused = (Math.clamp(dragStartHeight + (int)(dragStartY - (mouseY / minecraft.options.chatScale().get())), 20, 900) / lineHeight) * lineHeight;
             } else {
                 config.chatHeightUnfocused = (Math.clamp(dragStartHeight + (int)(dragStartY - (mouseY / minecraft.options.chatScale().get())), 20, 900) / lineHeight) * lineHeight;
