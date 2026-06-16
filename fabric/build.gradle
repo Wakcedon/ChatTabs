@@ -56,7 +56,7 @@ processResources {
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/chattabs.accesswidener")
+    useMojangMappings()
 }
 
 def targetJavaVersion = 21
