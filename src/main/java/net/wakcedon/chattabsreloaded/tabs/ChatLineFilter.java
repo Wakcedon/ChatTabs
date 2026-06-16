@@ -62,7 +62,7 @@ public class ChatLineFilter {
     }
     
     public List<ChatMessageList> filterChat(List<ChatMessageList> chatLists) {
-        return chatLists.stream().filter((Predicate<? super ChatMessageList>) filter).toList();
+        return chatLists.stream().filter(list -> list.getLines().stream().anyMatch(filter)).toList();
     }
     
     public boolean test(ChatLine message) {

@@ -76,7 +76,11 @@ public class ChatTabsConfigBase {
     @Expose
     public List<ServerProfile> serverProfiles = new ArrayList<>();
 
-    public PlatformConfig platformConfig;
+    private static PlatformConfig platformConfig;
+
+    public static void setPlatformConfig(PlatformConfig config) {
+        platformConfig = config;
+    }
 
     public static ChatTabsConfigBase getInstance() {
         if (platformConfig != null) {

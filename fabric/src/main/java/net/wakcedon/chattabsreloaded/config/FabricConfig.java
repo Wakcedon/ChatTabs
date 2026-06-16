@@ -23,7 +23,7 @@ public class FabricConfig implements PlatformConfig {
     public FabricConfig() {
         this.configPath = Path.of(getConfigPath());
         this.config = new ChatTabsConfigBase();
-        this.config.platformConfig = this;
+        ChatTabsConfigBase.setPlatformConfig(this);
     }
 
     @Override
@@ -34,14 +34,14 @@ public class FabricConfig implements PlatformConfig {
                 ChatTabsConfigBase loadedConfig = GSON.fromJson(json, ChatTabsConfigBase.class);
                 if (loadedConfig != null) {
                     this.config = loadedConfig;
-                    this.config.platformConfig = this;
+                    ChatTabsConfigBase.setPlatformConfig(this);
                     return;
                 }
             }
         } catch (Throwable ignored) {
         }
         this.config = new ChatTabsConfigBase();
-        this.config.platformConfig = this;
+        ChatTabsConfigBase.setPlatformConfig(this);
     }
 
     @Override
