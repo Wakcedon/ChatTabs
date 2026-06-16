@@ -7,7 +7,6 @@
     "MixinChatHud$Forwarder",
     "MixinChatHud$Hud",
     "MixinChatHud$Interactable",
-    "MixinAlphaCalculator",
     "MixinChatScreen"
   ],
   "injectors": {

@@ -3,9 +3,9 @@ package net.wakcedon.chattabsreloaded.render.screen;
 import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import net.wakcedon.chattabsreloaded.mixininterface.IChatHud;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
@@ -13,13 +13,12 @@ import java.util.List;
 
 public class EditChatScreen extends Screen {
     
-    public static final List<GuiMessage.Line> DUMMY_CHAT;
+    public static final List<ChatComponent.Line> DUMMY_CHAT;
     
     static {
         DUMMY_CHAT = new ArrayList<>(100);
         for(int i = 0; i < 100; i++) {
-            GuiMessage message = new GuiMessage(0, Component.literal("Line " + (i + 1)), null, null);
-            DUMMY_CHAT.add(new GuiMessage.Line(0, message.content().getVisualOrderText(), null, true));
+            DUMMY_CHAT.add(new ChatComponent.Line(i, Component.literal("Line " + (i + 1)).getVisualOrderText(), null, true));
         }
     }
     
@@ -45,7 +44,7 @@ public class EditChatScreen extends Screen {
         super(Component.translatable("chattabs.editchatscreen"));
         this.parent = parent;
         this.config = ChatTabsConfigBase.getInstance();
-        editFocusedWidget = new Checkbox(4, height - 30, font.width(Component.translatable("chattabs.editchatscreen.editfocused")) + 28, 20, Component.translatable("chattabs.editchatscreen.editfocused"), true);
+        editFocusedWidget = new Checkbox(4, height - 30, font.width(Component.translatable("chattabs.editchatscreen.editfocused")) + 28, Component.translatable("chattabs.editchatscreen.editfocused"), font, true, (checkbox, newValue) -> {});
         addRenderableWidget(editFocusedWidget);
     }
     
@@ -64,7 +63,7 @@ public class EditChatScreen extends Screen {
         ((IChatHud)minecraft.gui.getChat()).chatTabs$renderDummy(context, this.font, this.minecraft.gui.getGuiTicks(), mouseX, mouseY, editFocusedWidget.selected());
         super.render(context, mouseX, mouseY, deltaTicks);
         
-        context.pose().push();
+        context.pose().pushPose();
         
         int chatWidth = config.chatWidth + (int)(12 * minecraft.options.chatScale().get());
         int chatY = height - 41;
@@ -97,7 +96,7 @@ public class EditChatScreen extends Screen {
             }
         }
         
-        context.pose().pop();
+        context.pose().popPose();
     }
     
     @Override

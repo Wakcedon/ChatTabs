@@ -4,7 +4,7 @@ import net.wakcedon.chattabsreloaded.mixininterface.IChatHudDrawer;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 

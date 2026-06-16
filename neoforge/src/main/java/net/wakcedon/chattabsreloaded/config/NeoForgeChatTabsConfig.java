@@ -33,7 +33,7 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase {
     public static NeoForgeChatTabsConfig getInstance() {
         if (INSTANCE == null) {
             try {
-                load();
+                loadConfig();
             } catch (Throwable t) {
                 INSTANCE = new NeoForgeChatTabsConfig();
             }
@@ -41,7 +41,7 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase {
         return INSTANCE;
     }
 
-    public static void load() {
+    private static void loadConfig() {
         Path cfg = getConfigFile();
         try {
             if (Files.exists(cfg)) {
