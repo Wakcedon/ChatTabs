@@ -3,24 +3,11 @@ package net.wakcedon.chattabsreloaded.render.screen;
 import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import net.wakcedon.chattabsreloaded.mixininterface.IChatHud;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class EditChatScreen extends Screen {
-    
-    public static final List<ChatComponent.Line> DUMMY_CHAT;
-    
-    static {
-        DUMMY_CHAT = new ArrayList<>(100);
-        for(int i = 0; i < 100; i++) {
-            DUMMY_CHAT.add(new ChatComponent.Line(i, Component.literal("Line " + (i + 1)).getVisualOrderText(), null, true));
-        }
-    }
     
     private final Screen parent;
     
@@ -44,7 +31,7 @@ public class EditChatScreen extends Screen {
         super(Component.translatable("chattabs.editchatscreen"));
         this.parent = parent;
         this.config = ChatTabsConfigBase.getInstance();
-        editFocusedWidget = new Checkbox(4, height - 30, font.width(Component.translatable("chattabs.editchatscreen.editfocused")) + 28, Component.translatable("chattabs.editchatscreen.editfocused"), font, true, (checkbox, newValue) -> {});
+        editFocusedWidget = new Checkbox(4, height - 30, font.width(Component.translatable("chattabs.editchatscreen.editfocused")) + 28, 20, Component.translatable("chattabs.editchatscreen.editfocused"), font, true, (checkbox, newValue) -> {});
         addRenderableWidget(editFocusedWidget);
     }
     
