@@ -1,10 +1,8 @@
 package net.wakcedon.chattabsreloaded.render;
 
-import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
@@ -32,7 +30,7 @@ public class ChatContextMenu {
         this.elements.addAll(List.of(elements));
     }
     
-    public void render(Minecraft client, GuiGraphicsExtractor context, int windowWidth, int windowHeight, int mouseX, int mouseY) {
+    public void render(Minecraft client, GuiGraphics context, int windowWidth, int windowHeight, int mouseX, int mouseY) {
         if(x + width > windowWidth) {
             x = windowWidth - width;
         }
@@ -56,22 +54,21 @@ public class ChatContextMenu {
                 ey += DIVIDER_HEIGHT;
             } else {
                 boolean hovered = mouseX >= x && mouseY >= ey && mouseX < x + this.width && mouseY < ey + ELEMENT_HEIGHT;
-                if(hovered) context.requestCursor(CursorTypes.POINTING_HAND);
                 context.fill(x, ey, x + this.width, ey + ELEMENT_HEIGHT, hovered ? 0x80FFFFFF : 0x80000000);
-                context.text(client.font, element.text(), x + 2, ey + 2, -1, config.textShadow);
+                context.drawString(client.font, element.text(), x + 2, ey + 2, -1, config.textShadow);
                 ey += ELEMENT_HEIGHT;
             }
         }
     }
     
-    public boolean click(MouseButtonEvent click) {
-        if(click.button() == 0) {
+    public boolean click(double mouseX, double mouseY, int button) {
+        if(button == 0) {
             int ey = y;
             for(Element element : elements) {
                 if(element.isDivider()) {
                     ey += DIVIDER_HEIGHT;
                 } else {
-                    boolean hovered = click.x() >= x && click.y() >= ey && click.x() < x + width && click.y() < ey + ELEMENT_HEIGHT;
+                    boolean hovered = mouseX >= x && mouseY >= ey && mouseX < x + width && mouseY < ey + ELEMENT_HEIGHT;
                     if(hovered) {
                         element.handleClick();
                     }

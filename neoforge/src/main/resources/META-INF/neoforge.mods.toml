@@ -1,0 +1,30 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license = "GPL-3.0"
+
+[[mods]]
+modId = "chattabs-reloaded"
+version = "${mod_version}"
+displayName = "ChatTabs Reloaded"
+logoFile = "chattabs-reloaded/icon.png"
+credits = "Wakcedon, Gri11edHam"
+authors = "Wakcedon"
+description = '''
+Adds customizable, user-configurable chat tabs and filters — ChatTabs Reloaded (fork by Wakcedon)
+'''
+displayURL = "https://modrinth.com/mod/chat-tabs"
+issueTrackerURL = "https://github.com/Wakcedon/ChatTabs/issues"
+
+[[dependencies.chattabs-reloaded]]
+    modId = "minecraft"
+    type = "required"
+    versionRange = "[1.21,1.22)"
+    ordering = "NONE"
+    side = "CLIENT"
+
+[[dependencies.chattabs-reloaded]]
+    modId = "neoforge"
+    type = "required"
+    versionRange = "[21,)"
+    ordering = "NONE"
+    side = "CLIENT"

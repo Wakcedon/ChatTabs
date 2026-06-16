@@ -7,6 +7,7 @@ import net.wakcedon.chattabsreloaded.ChatTabs;
 import net.wakcedon.chattabsreloaded.profiles.ServerProfile;
 import net.wakcedon.chattabsreloaded.tabs.ChatLineFilter;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
+import net.neoforged.fml.loading.FMLPaths;
 
 import java.awt.*;
 import java.io.IOException;
@@ -65,29 +66,7 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase {
     }
 
     private static Path getConfigFile() {
-        // Try NeoForge config directory
-        try {
-            Class<?> neoForgeConfig = Class.forName("net.neoforged.fml.loading.moddiscovery.ModFileInfo");
-            Class<?> modContainer = Class.forName("net.neoforged.fml.ModContainer");
-            Class<?> configDir = Class.forName("net.neoforged.fml.loading.moddiscovery.ModDirectoryInfo");
-            // Simplified fallback for NeoForge
-            return Path.of(System.getProperty("user.dir")).resolve("config").resolve("chattabs.json");
-        } catch (Throwable ignored) {
-        }
-        // Fallback to Minecraft run directory /config via reflection
-        try {
-            Class<?> mc = Class.forName("net.minecraft.client.Minecraft");
-            Object instance = mc.getMethod("getInstance").invoke(null);
-            if (instance != null) {
-                Object gameDir = instance.getClass().getField("gameDirectory").get(instance);
-                if (gameDir instanceof java.io.File) {
-                    return ((java.io.File) gameDir).toPath().resolve("config").resolve("chattabs.json");
-                }
-            }
-        } catch (Throwable ignored) {
-        }
-        // Last resort: current working directory
-        return Path.of(System.getProperty("user.dir")).resolve("config").resolve("chattabs.json");
+        return FMLPaths.CONFIGDIR.get().resolve("chattabs.json");
     }
 
     @Override

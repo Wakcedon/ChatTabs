@@ -2,12 +2,11 @@ package net.wakcedon.chattabsreloaded.mixin;
 
 import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import net.wakcedon.chattabsreloaded.mixininterface.IChatHud;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.CommandSuggestions;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,8 +30,8 @@ public abstract class MixinChatScreen extends Screen {
         super(title);
     }
     
-    @Inject(method = "extractRenderState", at = @At("TAIL"))
-    private void renderChatContextMenu(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+    @Inject(method = "render", at = @At("TAIL"))
+    private void renderChatContextMenu(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         ChatComponent chatHud = this.minecraft.gui.getChat();
         ((IChatHud)chatHud).chatTabs$renderContextMenu(context, width, height, mouseX, mouseY, deltaTicks);
     }
@@ -52,28 +51,28 @@ public abstract class MixinChatScreen extends Screen {
     }
     
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
-    public void mouseClicked(MouseButtonEvent click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
+    public void mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         ChatComponent chatHud = this.minecraft.gui.getChat();
-        if(((IChatHud)chatHud).chatTabs$mouseClicked(click, doubled)) {
+        if(((IChatHud)chatHud).chatTabs$mouseClicked(mouseX, mouseY, button)) {
             cir.setReturnValue(true);
         }
     }
     
     @Override
-    public boolean mouseReleased(MouseButtonEvent click) {
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
         ChatComponent chatHud = this.minecraft.gui.getChat();
-        if(((IChatHud)chatHud).chatTabs$mouseReleased(click)) {
+        if(((IChatHud)chatHud).chatTabs$mouseReleased(mouseX, mouseY, button)) {
             return true;
         }
-        return super.mouseReleased(click);
+        return super.mouseReleased(mouseX, mouseY, button);
     }
     
     @Override
-    public boolean mouseDragged(MouseButtonEvent click, double offsetX, double offsetY) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         ChatComponent chatHud = this.minecraft.gui.getChat();
-        if(((IChatHud)chatHud).chatTabs$mouseDragged(click, offsetX, offsetY)) {
+        if(((IChatHud)chatHud).chatTabs$mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
             return true;
         }
-        return super.mouseDragged(click, offsetX, offsetY);
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 }

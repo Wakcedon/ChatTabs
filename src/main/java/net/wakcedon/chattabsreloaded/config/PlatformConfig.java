@@ -4,4 +4,5 @@ public interface PlatformConfig {
     void load();
     void save();
     String getConfigPath();
+    ChatTabsConfigBase getConfig();
 }

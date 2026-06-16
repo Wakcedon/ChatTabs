@@ -12,8 +12,9 @@ repositories {
 }
 
 dependencies {
-    // Expose the common module to NeoForge compilation and runtime.
     api project(':')
+    implementation "net.neoforged.fancymodloader:loader:${rootProject.loader_version}"
+    implementation "org.sinytra.forgified-fabric-api:forgified-fabric-api:${rootProject.forgified_fabric_api_version}"
 }
 
 def targetJavaVersion = 21
@@ -30,23 +31,31 @@ java {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
 }
-// NeoForge module compiles only its own sources; common code is provided as a dependency.
+
 sourceSets {
     main {
         java {
-            // Include the common module's source directory so NeoForge can compile against shared classes like ChatTabs.
             srcDir project(':').file('src/main/java')
+        }
+        resources {
+            srcDir project(':').file('src/main/resources')
         }
     }
 }
 
 neoForge {
     version = rootProject.neoForge_version
-    validateAccessTransformers = true
-    // Note: Do not pass Fabric access widener directly to NeoForge access-transformer
-    // tooling — formats differ (accessWidener vs AT). If you need to apply an access
-    // widener for NeoForge, convert it to AT format or configure NeoForge-specific
-    // access transformers here. Skipping auto-apply to avoid parser errors in CI.
+    validateAccessTransformers = false
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+        }
+    }
+
     mods {
         chattabs {
             sourceSet sourceSets.main

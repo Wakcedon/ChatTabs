@@ -1,16 +1,15 @@
 package net.wakcedon.chattabsreloaded.render;
 
-import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import net.wakcedon.chattabsreloaded.render.screen.EditChatScreen;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.Mth;
 
 public class ChatHudOverlays {
     
-    public static int[] renderChatTabs(Minecraft client, int tabScroll, GuiGraphicsExtractor context, int windowHeight, float chatScale, boolean expanded, int chatWidth, int mouseX, int mouseY, int messages, boolean mcTabUnreads) {
+    public static int[] renderChatTabs(Minecraft client, int tabScroll, GuiGraphics context, int windowHeight, float chatScale, boolean expanded, int chatWidth, int mouseX, int mouseY, int messages, boolean mcTabUnreads) {
         int hoveredTab = -1;
         ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
         if(!config.enabled || config.getVisibleChatTabs().isEmpty() || !expanded || chatScale == 0) return new int[]{hoveredTab, tabScroll};
@@ -24,7 +23,7 @@ public class ChatHudOverlays {
         int tabNum = 0;
         boolean hovered = (mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height) && !(client.screen instanceof EditChatScreen);
         context.fill(x, y, x + width, y + height, hovered ? config.bgColorHovered.getRGB() : config.bgColor.getRGB());
-        context.text(client.font, "MC", x + 2, y + 2, -1, config.textShadow);
+        context.drawString(client.font, "MC", x + 2, y + 2, -1, config.textShadow);
         if(config.selectedTab == tabNum) {
             context.fill(x, y - 1, x + width, y, config.selectedTabColor.getRGB());
         } else if(mcTabUnreads) {
@@ -38,7 +37,7 @@ public class ChatHudOverlays {
         if(tabScroll > -1) {
             hovered = (mouseX >= x && mouseX < x + scrollerWidth && mouseY >= y && mouseY < y + height) && !(client.screen instanceof EditChatScreen);
             context.fill(x, y, x + scrollerWidth, y + height, hovered ? config.bgColorHovered.getRGB() : config.bgColor.getRGB());
-            context.text(client.font, "<", x + 2, y + 2, -1, config.textShadow);
+            context.drawString(client.font, "<", x + 2, y + 2, -1, config.textShadow);
             if(hovered) {
                 hoveredTab = -2;
             }
@@ -57,7 +56,7 @@ public class ChatHudOverlays {
                 hovered = (mouseX >= chatWidth - scrollerWidth && mouseX < chatWidth && mouseY >= y && mouseY < y + height) && !(client.screen instanceof EditChatScreen);
                 context.fill(chatWidth - scrollerWidth, y, chatWidth, y + height, hovered ? config.bgColorHovered.getRGB() : config.bgColor.getRGB());
                 context.fill(x, y, chatWidth - scrollerWidth, y + height, config.bgColor.getRGB());
-                context.text(client.font, ">", chatWidth - scrollerWidth + 2, y + 2, -1, config.textShadow);
+                context.drawString(client.font, ">", chatWidth - scrollerWidth + 2, y + 2, -1, config.textShadow);
                 if(hovered) {
                     hoveredTab = -3;
                 }
@@ -65,7 +64,7 @@ public class ChatHudOverlays {
             }
             hovered = (mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height) && !(client.screen instanceof EditChatScreen);
             context.fill(x, y, x + width, y + height, hovered ? config.bgColorHovered.getRGB() : config.bgColor.getRGB());
-            context.text(client.font, tab.getName(), x + 2, y + 2, -1, config.textShadow);
+            context.drawString(client.font, tab.getName(), x + 2, y + 2, -1, config.textShadow);
             if(config.selectedTab == tabNum) {
                 context.fill(x, y - 1, x + width, y, config.selectedTabColor.getRGB());
             } else if(tab.hasUnreads()) {
@@ -83,8 +82,6 @@ public class ChatHudOverlays {
         } else if(!shouldScrollTabs) {
             tabScroll = -1;
         }
-        
-        if(hoveredTab != -1) context.requestCursor(CursorTypes.POINTING_HAND);
         
         return new int[]{hoveredTab, tabScroll};
     }

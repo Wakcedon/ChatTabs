@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 public class NeoForgeConfig implements PlatformConfig {
-    
+
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
             .excludeFieldsWithoutExposeAnnotation()
@@ -20,8 +20,8 @@ public class NeoForgeConfig implements PlatformConfig {
     private final Path configPath;
     private ChatTabsConfigBase config;
 
-    public NeoForgeConfig() {
-        this.configPath = Path.of(getConfigPath());
+    public NeoForgeConfig(String configPath) {
+        this.configPath = Path.of(configPath);
         this.config = new ChatTabsConfigBase();
         this.config.platformConfig = this;
     }
@@ -56,18 +56,7 @@ public class NeoForgeConfig implements PlatformConfig {
 
     @Override
     public String getConfigPath() {
-        try {
-            Class<?> mc = Class.forName("net.minecraft.client.Minecraft");
-            Object instance = mc.getMethod("getInstance").invoke(null);
-            if (instance != null) {
-                Object gameDir = instance.getClass().getField("gameDirectory").get(instance);
-                if (gameDir instanceof java.io.File) {
-                    return ((java.io.File) gameDir).toPath().resolve("config").resolve("chattabs.json").toString();
-                }
-            }
-        } catch (Throwable ignored) {
-        }
-        return Path.of(System.getProperty("user.dir")).resolve("config").resolve("chattabs.json").toString();
+        return configPath.toString();
     }
 
     public ChatTabsConfigBase getConfig() {

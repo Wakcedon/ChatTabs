@@ -3,6 +3,7 @@ package net.wakcedon.chattabsreloaded.neoforge;
 import net.wakcedon.chattabsreloaded.ChatTabs;
 import net.wakcedon.chattabsreloaded.config.NeoForgeConfig;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.loading.FMLPaths;
 
 @Mod("chattabs-reloaded")
 public class NeoForgeMod {
@@ -10,13 +11,11 @@ public class NeoForgeMod {
     private static NeoForgeConfig config;
 
     public NeoForgeMod() {
-        // call into common init
         ChatTabs.init();
-        config = new NeoForgeConfig();
+        config = new NeoForgeConfig(FMLPaths.CONFIGDIR.get().resolve("chattabs.json").toString());
         config.load();
-        // Config is now loaded and accessible through getConfig()
     }
-    
+
     public static NeoForgeConfig getConfig() {
         return config;
     }

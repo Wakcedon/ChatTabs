@@ -3,13 +3,9 @@
   "minVersion": "0.8",
   "package": "net.wakcedon.chattabsreloaded.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [
-    "MixinChatHud$Hud"
-  ],
   "client": [
-    "MixinAlphaCalculator",
-    "MixinChatHud",
     "MixinChatHud$Forwarder",
+    "MixinChatHud$Hud",
     "MixinChatHud$Interactable",
     "MixinChatScreen"
   ],
