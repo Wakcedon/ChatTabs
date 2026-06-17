@@ -39,6 +39,6 @@ Outputs
 - `neoforge/build/libs/` — NeoForge mod JAR
 
 Translations
-- Russian locale is included at `fabric/src/main/resources/assets/chattabs-reloaded/lang/ru_ru.json`.
+- Russian locale is included at `fabric/src/main/resources/assets/chattabs_reloaded/lang/ru_ru.json`.
 
 If you'd like to help translate or contribute, see CONTRIBUTING.md.
