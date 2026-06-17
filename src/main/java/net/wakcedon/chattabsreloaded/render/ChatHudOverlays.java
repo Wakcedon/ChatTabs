@@ -64,16 +64,16 @@ public class ChatHudOverlays {
             context.drawString(client.font, tabName.getString(), x + 3, y + 2, -1, config.textShadow);
             if(config.selectedTab == tabNum) {
                 int c = config.selectedTabColor.getRGB();
-                context.fill(x - 1, y - 1, x + width + 1, y, c);
-                context.fill(x - 1, y + height, x + width + 1, y + height + 1, c);
-                context.fill(x - 1, y, x, y + height, c);
-                context.fill(x + width, y, x + width + 1, y + height, c);
+                context.fill(x + 2, y - 1, x + width - 2, y, c);
+                context.fill(x + 2, y + height, x + width - 2, y + height + 1, c);
+                context.fill(x - 1, y + 2, x, y + height - 2, c);
+                context.fill(x + width, y + 2, x + width + 1, y + height - 2, c);
             } else if(tab.hasUnreads()) {
                 int c = config.unreadColor.getRGB();
-                context.fill(x - 1, y - 1, x + width + 1, y, c);
-                context.fill(x - 1, y + height, x + width + 1, y + height + 1, c);
-                context.fill(x - 1, y, x, y + height, c);
-                context.fill(x + width, y, x + width + 1, y + height, c);
+                context.fill(x + 2, y - 1, x + width - 2, y, c);
+                context.fill(x + 2, y + height, x + width - 2, y + height + 1, c);
+                context.fill(x - 1, y + 2, x, y + height - 2, c);
+                context.fill(x + width, y + 2, x + width + 1, y + height - 2, c);
             }
             if(hovered) {
                 hoveredTab = tabNum;

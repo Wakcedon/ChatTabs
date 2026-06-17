@@ -74,6 +74,10 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         "Торговля", "Аукцион", "Важно"
     };
 
+    private static final String[] GLOBAL_CIRCLED = {
+        "🄶", "Ⓖ", "🅖", "🅶", "🌐"
+    };
+
     private static final String[] LOCAL_TAGS = {
         // English
         "Local", "L",
@@ -81,14 +85,22 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         "Локальный", "Локал", "Л"
     };
 
+    private static final String[] LOCAL_CIRCLED = {
+        "🄻", "Ⓛ", "🅛", "🅻", "📍"
+    };
+
     private static String buildGlobalRegex() {
         String tags = String.join("|", GLOBAL_TAGS);
-        return "^[!?].*|.*\\[(?:" + tags + ")\\].*";
+        String circled = String.join("|", GLOBAL_CIRCLED);
+        return "^[!?].*|.*(?:" + circled + ").*|.*\\[(?:" + tags + ")\\].*";
     }
 
     private static String buildLocalRegex() {
-        String tags = String.join("|", GLOBAL_TAGS);
-        return "^(?![!?])(?!.*\\[(?:" + tags + ")\\]).*";
+        String globalTags = String.join("|", GLOBAL_TAGS);
+        String globalCircled = String.join("|", GLOBAL_CIRCLED);
+        String localTags = String.join("|", LOCAL_TAGS);
+        String localCircled = String.join("|", LOCAL_CIRCLED);
+        return "^(?![!?])(?!.*(?:" + globalCircled + "))(?!.*\\[(?:" + globalTags + ")\\])(?:.*(?:" + localCircled + ").*|.*\\[(?:" + localTags + ")\\].*|.*: .*)";
     }
 
     private void createDefaultTabs() {
