@@ -1,6 +1,7 @@
 package net.wakcedon.chattabsreloaded.tabs;
 
 import com.google.gson.annotations.Expose;
+import net.minecraft.network.chat.Component;
 import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 
 import java.util.Deque;
@@ -75,6 +76,10 @@ public class ChatTab {
     
     public String getName() {
         return name;
+    }
+
+    public Component getDisplayComponent() {
+        return Component.translatable(this.name);
     }
     
     public boolean shouldSave() {

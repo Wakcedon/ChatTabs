@@ -5,6 +5,7 @@ import net.wakcedon.chattabsreloaded.render.screen.EditChatScreen;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
 public class ChatHudOverlays {
@@ -12,7 +13,7 @@ public class ChatHudOverlays {
     public static int[] renderChatTabs(Minecraft client, int tabScroll, GuiGraphics context, int windowHeight, float chatScale, boolean expanded, int chatWidth, int mouseX, int mouseY, int messages, boolean mcTabUnreads) {
         int hoveredTab = -1;
         ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
-        if(!config.enabled || config.getVisibleChatTabs().isEmpty() || !expanded || chatScale == 0) return new int[]{hoveredTab, tabScroll};
+        if(!config.enabled || config.getVisibleChatTabs().isEmpty() || chatScale == 0) return new int[]{hoveredTab, tabScroll};
         
         int height = 13;
         int x = 0;
@@ -50,7 +51,8 @@ public class ChatHudOverlays {
                 shouldScrollTabs = true;
                 continue;
             }
-            width = client.font.width(tab.getName()) + 4;
+            Component tabName = tab.getDisplayComponent();
+            width = client.font.width(tabName.getString()) + 4;
             if(x + width > chatWidth - scrollerWidth) {
                 shouldScrollTabs = true;
                 hovered = (mouseX >= chatWidth - scrollerWidth && mouseX < chatWidth && mouseY >= y && mouseY < y + height) && !(client.screen instanceof EditChatScreen);
@@ -64,7 +66,7 @@ public class ChatHudOverlays {
             }
             hovered = (mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height) && !(client.screen instanceof EditChatScreen);
             context.fill(x, y, x + width, y + height, hovered ? config.bgColorHovered.getRGB() : config.bgColor.getRGB());
-            context.drawString(client.font, tab.getName(), x + 2, y + 2, -1, config.textShadow);
+            context.drawString(client.font, tabName.getString(), x + 2, y + 2, -1, config.textShadow);
             if(config.selectedTab == tabNum) {
                 context.fill(x, y - 1, x + width, y, config.selectedTabColor.getRGB());
             } else if(tab.hasUnreads()) {

@@ -5,7 +5,9 @@ import net.wakcedon.chattabsreloaded.mixininterface.IChatHud;
 import net.wakcedon.chattabsreloaded.render.ChatContextMenu;
 import net.wakcedon.chattabsreloaded.render.ChatHudOverlays;
 import net.wakcedon.chattabsreloaded.render.screen.EditChatScreen;
+import net.wakcedon.chattabsreloaded.tabs.ChatLine;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
+import net.wakcedon.chattabsreloaded.tabs.NeoForgeChatLine;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -41,10 +43,23 @@ public abstract class MixinChatHud implements IChatHud {
 
         int[] result = ChatHudOverlays.renderChatTabs(
             client, chattabs$tabScroll, guiGraphics, windowHeight, chatScale,
-            focused, config.chatWidth, mouseX, mouseY, 0, mcTabUnreads
+            true, config.chatWidth, mouseX, mouseY, 0, mcTabUnreads
         );
         chattabs$hoveredTab = result[0];
         chattabs$tabScroll = result[1];
+    }
+
+    @Inject(method = "addMessage(Lnet/minecraft/network/chat/Component;)V", at = @At("HEAD"))
+    private void chattabs$onAddMessage(Component message, CallbackInfo ci) {
+        ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
+        if(!config.enabled) return;
+
+        ChatLine line = new NeoForgeChatLine(message, true);
+        for(ChatTab tab : config.getVisibleChatTabs()) {
+            if(tab.getFilter().test(line)) {
+                tab.addChatLine(line);
+            }
+        }
     }
 
     @Override

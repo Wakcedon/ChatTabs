@@ -7,6 +7,7 @@ import net.wakcedon.chattabsreloaded.ChatTabs;
 import net.wakcedon.chattabsreloaded.profiles.ServerProfile;
 import net.wakcedon.chattabsreloaded.tabs.ChatLineFilter;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
+import net.wakcedon.chattabsreloaded.tabs.SendModifier;
 import net.minecraft.client.Minecraft;
 
 import java.awt.*;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -44,6 +46,10 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
                 if(loaded != null) {
                     applyFrom(loaded);
                     ChatTabsConfigBase.setPlatformConfig(this);
+                    if(getChatTabs().isEmpty()) {
+                        createDefaultTabs();
+                        save();
+                    }
                     return;
                 }
             }
@@ -51,6 +57,24 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
             ChatTabs.LOGGER.warning("Failed to load config: " + t.getMessage());
         }
         ChatTabsConfigBase.setPlatformConfig(this);
+        if(getChatTabs().isEmpty()) {
+            createDefaultTabs();
+        }
+    }
+
+    private void createDefaultTabs() {
+        ArrayList<ChatTab> defaults = new ArrayList<>();
+        defaults.add(new ChatTab("tab.all", "chattabs.tab.all", true, true,
+                new ChatLineFilter(".*"),
+                new SendModifier()));
+        defaults.add(new ChatTab("tab.global", "chattabs.tab.global", true, true,
+                new ChatLineFilter(".*\\[(Global|G(?![a-zA-Z])|GLOBAL|Глобальный чат|глобальный чат|Глобал|глобал|ГЛОБАЛ|Global Chat|GlobalChat|GC(?![a-zA-Z])|World|W(?![a-zA-Z])|WORLD|Public|PUBLIC|All|ГЧ|гч|Server|Broadcast|Announcement).*"),
+                new SendModifier()));
+        defaults.add(new ChatTab("tab.local", "chattabs.tab.local", true, true,
+                new ChatLineFilter("(<[^>]+>.*)|(.*\\[(Local|L(?![a-zA-Z])|LOCAL|Локальный|локальный|Локал|локал|ЛОКАЛ|Local Chat|LocalChat|LC|ЛЧ|лч).*)"),
+                new SendModifier()));
+        getChatTabs().addAll(defaults);
+        ChatTabs.LOGGER.info("Created 3 default tabs");
     }
 
     @Override

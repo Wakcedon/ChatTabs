@@ -64,5 +64,9 @@
   "chattabsconfig.previewtime": "Preview Time",
   "chattabsconfig.previewtime.tooltip": "How long should message previews be displayed (in seconds).",
   "chattabsconfig.chattab.visiblebydefault": "Visible",
-  "chattabsconfig.chattab.visiblebydefault.tooltip": "If enable, this tab will be shown when there is no server profile for the server.\nOtherwise, it will only be shown if the server profile selects this tab."
+  "chattabsconfig.chattab.visiblebydefault.tooltip": "If enable, this tab will be shown when there is no server profile for the server.\nOtherwise, it will only be shown if the server profile selects this tab.",
+
+  "chattabs.tab.all": "All",
+  "chattabs.tab.global": "Global",
+  "chattabs.tab.local": "Local"
 }
