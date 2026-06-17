@@ -63,10 +63,11 @@ public abstract class MixinChatHud implements IChatHud {
     }
 
     @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIIZ)V", at = @At("RETURN"))
+    @SuppressWarnings("unchecked")
     private void chattabs$restoreAfterRender(GuiGraphics guiGraphics, int tickCount, int mouseX, int mouseY, boolean focused, CallbackInfo ci) {
         if(chattabs$savedTrimmedMessages != null) {
             this.trimmedMessages.clear();
-            this.trimmedMessages.addAll(chattabs$savedTrimmedMessages);
+            this.trimmedMessages.addAll((List) chattabs$savedTrimmedMessages);
             chattabs$savedTrimmedMessages = null;
         }
     }
