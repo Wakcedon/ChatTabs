@@ -86,17 +86,5 @@ public abstract class MixinChatScreen extends Screen {
         }
     }
 
-    @Inject(method = "mouseReleased", at = @At("HEAD"), cancellable = true)
-    public void mouseReleased(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-        if(((IChatHud)this.minecraft.gui.getChat()).chatTabs$mouseReleased(mouseX, mouseY, button)) {
-            cir.setReturnValue(true);
-        }
-    }
 
-    @Inject(method = "mouseDragged", at = @At("HEAD"), cancellable = true)
-    public void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY, CallbackInfoReturnable<Boolean> cir) {
-        if(((IChatHud)this.minecraft.gui.getChat()).chatTabs$mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
-            cir.setReturnValue(true);
-        }
-    }
 }
