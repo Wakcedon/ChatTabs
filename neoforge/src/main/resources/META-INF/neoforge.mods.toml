@@ -14,6 +14,7 @@ Adds customizable, user-configurable chat tabs and filters — ChatTabs Reloaded
 '''
 displayURL = "https://modrinth.com/mod/chattabs-reloaded"
 issueTrackerURL = "https://github.com/Wakcedon/ChatTabs/issues"
+mixins = ["chattabs_reloaded.mixins.json"]
 
 [[dependencies.chattabs_reloaded]]
     modId = "minecraft"
