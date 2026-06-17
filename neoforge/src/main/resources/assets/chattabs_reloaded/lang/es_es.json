@@ -1,4 +1,10 @@
 {
+  "chattabs_reloaded.configuration.title": "Configuración de %s",
+  "chattabs_reloaded.configuration.general": "General",
+  "chattabs_reloaded.configuration.general.tooltip": "Configuración general",
+  "chattabs_reloaded.configuration.appearance": "Apariencia",
+  "chattabs_reloaded.configuration.appearance.tooltip": "Configuración de apariencia",
+
   "chattabsconfig.title": "Configuración de Chat Tabs",
 
   "chattabsconfig.category.general": "General",

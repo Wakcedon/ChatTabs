@@ -9,6 +9,7 @@ displayName = "ChatTabs Reloaded"
 logoFile = "chattabs_reloaded/icon.png"
 credits = "Wakcedon, Gri11edHam"
 authors = "Wakcedon"
+side = "CLIENT"
 description = '''
 Adds customizable, user-configurable chat tabs and filters — ChatTabs Reloaded (fork by Wakcedon)
 '''

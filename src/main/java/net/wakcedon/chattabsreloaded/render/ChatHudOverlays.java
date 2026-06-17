@@ -47,7 +47,7 @@ public class ChatHudOverlays {
                 continue;
             }
             Component tabName = tab.getDisplayComponent();
-            width = client.font.width(tabName.getString()) + 4;
+            width = client.font.width(tabName.getString()) + 8;
             if(x + width > chatWidth - scrollerWidth) {
                 shouldScrollTabs = true;
                 hovered = (mouseX >= chatWidth - scrollerWidth && mouseX < chatWidth && mouseY >= y && mouseY < y + height) && !(client.screen instanceof EditChatScreen);
@@ -63,9 +63,9 @@ public class ChatHudOverlays {
             fillRoundedRect(context, x, y, width, height, hovered ? config.bgColorHovered.getRGB() : config.bgColor.getRGB());
             context.drawString(client.font, tabName.getString(), x + 3, y + 2, -1, config.textShadow);
             if(config.selectedTab == tabNum) {
-                context.fill(x, y - 1, x + width, y, config.selectedTabColor.getRGB());
+                context.fill(x + 2, y - 1, x + width - 2, y, config.selectedTabColor.getRGB());
             } else if(tab.hasUnreads()) {
-                context.fill(x, y - 1, x + width, y, config.unreadColor.getRGB());
+                context.fill(x + 2, y - 1, x + width - 2, y, config.unreadColor.getRGB());
             }
             if(hovered) {
                 hoveredTab = tabNum;

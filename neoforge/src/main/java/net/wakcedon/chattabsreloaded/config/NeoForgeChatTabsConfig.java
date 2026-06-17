@@ -10,6 +10,7 @@ import net.wakcedon.chattabsreloaded.tabs.ChatTab;
 import net.wakcedon.chattabsreloaded.tabs.SendModifier;
 import net.minecraft.client.Minecraft;
 
+import net.wakcedon.chattabsreloaded.neoforge.ChatTabsModConfig;
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -86,6 +87,15 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         } catch(IOException e) {
             ChatTabs.LOGGER.warning("Failed to save config: " + e.getMessage());
         }
+    }
+
+    public void syncFromSpec() {
+        this.enabled = ChatTabsModConfig.CLIENT.enabled.get();
+        this.maxLines = ChatTabsModConfig.CLIENT.maxLines.get();
+        this.previewTime = ChatTabsModConfig.CLIENT.previewTime.get().floatValue();
+        this.clearHistory = ChatTabsModConfig.CLIENT.clearHistory.get();
+        this.textShadow = ChatTabsModConfig.CLIENT.textShadow.get();
+        this.autoGenerateMsgTabs = ChatTabsModConfig.CLIENT.autoGenerateMsgTabs.get();
     }
 
     @Override
