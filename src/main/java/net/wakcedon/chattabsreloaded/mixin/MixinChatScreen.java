@@ -27,9 +27,6 @@ public abstract class MixinChatScreen extends Screen {
     @Shadow
     private CommandSuggestions commandSuggestions;
 
-    @Shadow
-    protected abstract boolean insertionClickMode();
-
     @Unique
     private int chattabs$tabScroll = -1;
     @Unique
@@ -39,7 +36,7 @@ public abstract class MixinChatScreen extends Screen {
         super(title);
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
+    @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", at = @At("TAIL"))
     private void renderChatContextMenu(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         ((IChatHud)this.minecraft.gui.getChat()).chatTabs$renderContextMenu(context, width, height, mouseX, mouseY, deltaTicks);
         chattabs$renderTabs(context, mouseX, mouseY);
