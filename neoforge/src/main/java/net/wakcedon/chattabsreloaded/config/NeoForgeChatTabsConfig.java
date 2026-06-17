@@ -63,16 +63,44 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         }
     }
 
+    private static final String[] GLOBAL_TAGS = {
+        // English
+        "Global", "G", "Server", "Broadcast", "Announcement",
+        "Staff", "Admin", "Mod", "Event", "Shout", "World",
+        "Trade", "Auction", "Tip", "Notice",
+        // Russian
+        "Глобальный", "Глобал", "Г", "Сервер", "Объявление",
+        "Админ", "Модератор", "Мод", "Ивент", "Мир",
+        "Торговля", "Аукцион", "Важно"
+    };
+
+    private static final String[] LOCAL_TAGS = {
+        // English
+        "Local", "L",
+        // Russian
+        "Локальный", "Локал", "Л"
+    };
+
+    private static String buildGlobalRegex() {
+        String tags = String.join("|", GLOBAL_TAGS);
+        return "^[!?].*|.*\\[(?:" + tags + ")\\].*";
+    }
+
+    private static String buildLocalRegex() {
+        String tags = String.join("|", GLOBAL_TAGS);
+        return "^(?![!?])(?!.*\\[(?:" + tags + ")\\]).*";
+    }
+
     private void createDefaultTabs() {
         ArrayList<ChatTab> defaults = new ArrayList<>();
         defaults.add(new ChatTab("tab.all", "chattabs.tab.all", true, true,
                 new ChatLineFilter(".*"),
                 new SendModifier()));
         defaults.add(new ChatTab("tab.global", "chattabs.tab.global", true, true,
-                new ChatLineFilter("^[!?].*|\\[(?:Global|Server|Broadcast|Announcement|G\\b|GC)\\]", false),
+                new ChatLineFilter(buildGlobalRegex(), false),
                 new SendModifier("!")));
         defaults.add(new ChatTab("tab.local", "chattabs.tab.local", true, true,
-                new ChatLineFilter("^[^!?].*|\\[(?:Local|L\\b|LC)\\]", false),
+                new ChatLineFilter(buildLocalRegex(), false),
                 new SendModifier()));
         getChatTabs().addAll(defaults);
         ChatTabs.LOGGER.info("Created 3 default tabs");
@@ -96,6 +124,18 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         this.clearHistory = ChatTabsModConfig.CLIENT.clearHistory.get();
         this.textShadow = ChatTabsModConfig.CLIENT.textShadow.get();
         this.autoGenerateMsgTabs = ChatTabsModConfig.CLIENT.autoGenerateMsgTabs.get();
+        this.selectedTabColor = parseHexColor(ChatTabsModConfig.CLIENT.selectedTabColor.get());
+        this.unreadColor = parseHexColor(ChatTabsModConfig.CLIENT.unreadColor.get());
+        this.bgColor = parseHexColor(ChatTabsModConfig.CLIENT.bgColor.get());
+        this.bgColorHovered = parseHexColor(ChatTabsModConfig.CLIENT.bgColorHovered.get());
+    }
+
+    private static Color parseHexColor(String hex) {
+        try {
+            return new Color((int) Long.parseLong(hex.replace("#", ""), 16), true);
+        } catch(Exception e) {
+            return new Color(0x80000000, true);
+        }
     }
 
     @Override

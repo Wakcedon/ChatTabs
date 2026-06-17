@@ -12,6 +12,10 @@ public class ChatTabsModConfig {
         public final ModConfigSpec.BooleanValue clearHistory;
         public final ModConfigSpec.BooleanValue textShadow;
         public final ModConfigSpec.BooleanValue autoGenerateMsgTabs;
+        public final ModConfigSpec.ConfigValue<String> selectedTabColor;
+        public final ModConfigSpec.ConfigValue<String> unreadColor;
+        public final ModConfigSpec.ConfigValue<String> bgColor;
+        public final ModConfigSpec.ConfigValue<String> bgColorHovered;
 
         Client(ModConfigSpec.Builder builder) {
             builder.comment("General settings").push("general");
@@ -49,6 +53,26 @@ public class ChatTabsModConfig {
                     .comment("Should the chat text have a shadow. Minecraft default is true.")
                     .translation("chattabsconfig.textshadow")
                     .define("textShadow", true);
+
+            selectedTabColor = builder
+                    .comment("Color of the selected tab border (hex ARGB, e.g. #FFFFFFFF for white).")
+                    .translation("chattabsconfig.selectedtabcolor")
+                    .define("selectedTabColor", "#FFFFFFFF");
+
+            unreadColor = builder
+                    .comment("Color of the unread indicator border (hex ARGB, e.g. #FF00AAAA for cyan).")
+                    .translation("chattabsconfig.unreadcolor")
+                    .define("unreadColor", "#FF00AAAA");
+
+            bgColor = builder
+                    .comment("Background color for tabs (hex ARGB, e.g. #80000000 for semi-transparent black).")
+                    .translation("chattabsconfig.bgcolor")
+                    .define("bgColor", "#80000000");
+
+            bgColorHovered = builder
+                    .comment("Background color for hovered tabs (hex ARGB, e.g. #80FFFFFF).")
+                    .translation("chattabsconfig.bgcolorhovered")
+                    .define("bgColorHovered", "#80FFFFFF");
 
             builder.pop();
         }

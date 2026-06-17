@@ -63,15 +63,23 @@ public class ChatHudOverlays {
             fillRoundedRect(context, x, y, width, height, hovered ? config.bgColorHovered.getRGB() : config.bgColor.getRGB());
             context.drawString(client.font, tabName.getString(), x + 3, y + 2, -1, config.textShadow);
             if(config.selectedTab == tabNum) {
-                context.fill(x + 2, y - 1, x + width - 2, y, config.selectedTabColor.getRGB());
+                int c = config.selectedTabColor.getRGB();
+                context.fill(x - 1, y - 1, x + width + 1, y, c);
+                context.fill(x - 1, y + height, x + width + 1, y + height + 1, c);
+                context.fill(x - 1, y, x, y + height, c);
+                context.fill(x + width, y, x + width + 1, y + height, c);
             } else if(tab.hasUnreads()) {
-                context.fill(x + 2, y - 1, x + width - 2, y, config.unreadColor.getRGB());
+                int c = config.unreadColor.getRGB();
+                context.fill(x - 1, y - 1, x + width + 1, y, c);
+                context.fill(x - 1, y + height, x + width + 1, y + height + 1, c);
+                context.fill(x - 1, y, x, y + height, c);
+                context.fill(x + width, y, x + width + 1, y + height, c);
             }
             if(hovered) {
                 hoveredTab = tabNum;
             }
             tabNum++;
-            x += width + 2;
+            x += width + 4;
         }
         
         if(shouldScrollTabs && tabScroll < 0) {
