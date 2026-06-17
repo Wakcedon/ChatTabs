@@ -10,31 +10,19 @@ import net.minecraft.util.Mth;
 
 public class ChatHudOverlays {
     
-    public static int[] renderChatTabs(Minecraft client, int tabScroll, GuiGraphics context, int windowHeight, float chatScale, boolean expanded, int chatWidth, int mouseX, int mouseY, int messages, boolean mcTabUnreads) {
+    public static int[] renderChatTabs(Minecraft client, int tabScroll, GuiGraphics context, int windowHeight, float chatScale, boolean expanded, int chatWidth, int mouseX, int mouseY, int messages, boolean mcTabUnreads, int baseYOffset) {
         int hoveredTab = -1;
         ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
         if(!config.enabled || config.getVisibleChatTabs().isEmpty() || chatScale == 0) return new int[]{hoveredTab, tabScroll};
         
         int height = 13;
         int x = 0;
-        int y = Mth.floor((windowHeight - 40) / chatScale);
+        int y = Mth.floor((windowHeight - baseYOffset) / chatScale);
         y -= ((messages * (int)(9 * (client.options.chatLineSpacing().get() + 1))) + height);
-        int width = client.font.width("MC") + 4;
         int scrollerWidth = client.font.width("<") + 4;
         int tabNum = 0;
-        boolean hovered = (mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height) && !(client.screen instanceof EditChatScreen);
-        context.fill(x, y, x + width, y + height, hovered ? config.bgColorHovered.getRGB() : config.bgColor.getRGB());
-        context.drawString(client.font, "MC", x + 2, y + 2, -1, config.textShadow);
-        if(config.selectedTab == tabNum) {
-            context.fill(x, y - 1, x + width, y, config.selectedTabColor.getRGB());
-        } else if(mcTabUnreads) {
-            context.fill(x, y - 1, x + width, y, config.unreadColor.getRGB());
-        }
-        if(hovered) {
-            hoveredTab = tabNum;
-        }
-        tabNum++;
-        x += width;
+        int width;
+        boolean hovered;
         if(tabScroll > -1) {
             hovered = (mouseX >= x && mouseX < x + scrollerWidth && mouseY >= y && mouseY < y + height) && !(client.screen instanceof EditChatScreen);
             context.fill(x, y, x + scrollerWidth, y + height, hovered ? config.bgColorHovered.getRGB() : config.bgColor.getRGB());
@@ -46,7 +34,7 @@ public class ChatHudOverlays {
         }
         boolean shouldScrollTabs = false;
         for(ChatTab tab : config.getVisibleChatTabs()) {
-            if(tabNum < tabScroll + 1) {
+            if(tabScroll > -1 && tabNum < tabScroll) {
                 tabNum++;
                 shouldScrollTabs = true;
                 continue;

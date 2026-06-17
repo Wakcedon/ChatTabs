@@ -27,6 +27,9 @@ public abstract class MixinChatScreen extends Screen {
     @Shadow
     private CommandSuggestions commandSuggestions;
 
+    @Shadow
+    private net.minecraft.client.gui.components.EditBox input;
+
     @Unique
     private int chattabs$tabScroll = -1;
     @Unique
@@ -52,19 +55,22 @@ public abstract class MixinChatScreen extends Screen {
 
         int windowHeight = client.getWindow().getGuiScaledHeight();
         float chatScale = client.options.chatScale().get().floatValue();
+        int baseYOffset = height - input.getY();
 
         int[] result = ChatHudOverlays.renderChatTabs(
             client, chattabs$tabScroll, guiGraphics, windowHeight, chatScale,
-            true, config.chatWidth, mouseX, mouseY, 0, false
+            true, config.chatWidth, mouseX, mouseY, 0, false, baseYOffset
         );
         chattabs$hoveredTab = result[0];
         chattabs$tabScroll = result[1];
+
+        ((IChatHud)client.gui.getChat()).chatTabs$setHoverState(chattabs$hoveredTab, chattabs$tabScroll);
     }
 
     @Redirect(method = "handleChatInput", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendChat(Ljava/lang/String;)V"))
     private void modifyChatMessage(ClientPacketListener instance, String content) {
         ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
-        if(config.enabled && config.selectedTab > 0) {
+        if(config.enabled) {
             ChatTab selectedTab = config.getSelectedChatTab();
             if(selectedTab != null) {
                 content = selectedTab.modifySend(content);

@@ -44,11 +44,10 @@ public abstract class MixinChatHud implements IChatHud {
 
         int windowHeight = client.getWindow().getGuiScaledHeight();
         float chatScale = client.options.chatScale().get().floatValue();
-        boolean mcTabUnreads = false;
 
         int[] result = ChatHudOverlays.renderChatTabs(
             client, chattabs$tabScroll, guiGraphics, windowHeight, chatScale,
-            true, config.chatWidth, mouseX, mouseY, 0, mcTabUnreads
+            true, config.chatWidth, mouseX, mouseY, 0, false, 40
         );
         chattabs$hoveredTab = result[0];
         chattabs$tabScroll = result[1];
@@ -90,11 +89,7 @@ public abstract class MixinChatHud implements IChatHud {
             chattabs$tabScroll++;
             return true;
         }
-        if(chattabs$hoveredTab == 0) {
-            config.selectedTab = 0;
-            return true;
-        }
-        if(chattabs$hoveredTab > 0) {
+        if(chattabs$hoveredTab >= 0) {
             if(button == 1) {
                 chattabs$showTabContextMenu(client, (int)mouseX, (int)mouseY);
             } else {
@@ -113,6 +108,12 @@ public abstract class MixinChatHud implements IChatHud {
     @Override
     public boolean chatTabs$mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         return false;
+    }
+
+    @Override
+    public void chatTabs$setHoverState(int hoveredTab, int tabScroll) {
+        chattabs$hoveredTab = hoveredTab;
+        chattabs$tabScroll = tabScroll;
     }
 
     @Override
@@ -147,8 +148,8 @@ public abstract class MixinChatHud implements IChatHud {
             }),
             new ChatContextMenu.Element(),
             new ChatContextMenu.Element(Component.translatable("chattabsconfig.contextmenu.tab.delete"), () -> {
-                if(chattabs$hoveredTab > 1) {
-                    config.getChatTabs().remove(chattabs$hoveredTab - 1);
+                if(chattabs$hoveredTab > 0) {
+                    config.getChatTabs().remove(chattabs$hoveredTab);
                     if(config.selectedTab >= chattabs$hoveredTab) config.selectedTab--;
                     chattabs$contextMenu = null;
                 }

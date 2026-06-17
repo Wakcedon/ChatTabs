@@ -96,8 +96,8 @@ public class ChatTabsConfigBase {
     public ChatTab getSelectedChatTab() {
         List<ChatTab> chatTabs = getVisibleChatTabs();
         if (chatTabs.isEmpty()) return null;
-        while (selectedTab - 1 >= chatTabs.size()) selectedTab--;
-        return chatTabs.get(selectedTab - 1);
+        while (selectedTab >= chatTabs.size()) selectedTab--;
+        return chatTabs.get(selectedTab);
     }
 
     public boolean shouldSaveGenerated() {

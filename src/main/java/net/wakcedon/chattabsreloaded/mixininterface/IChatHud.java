@@ -12,4 +12,6 @@ public interface IChatHud {
     void chatTabs$renderContextMenu(GuiGraphics context, int windowWidth, int windowHeight, int mouseX, int mouseY, float deltaTicks);
     
     void chatTabs$renderDummy(GuiGraphics context, Font textRenderer, int ticks, int mouseX, int mouseY, boolean checked);
+    
+    void chatTabs$setHoverState(int hoveredTab, int tabScroll);
 }
