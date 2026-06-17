@@ -8,10 +8,6 @@ import net.wakcedon.chattabsreloaded.tabs.ChatLineFilter;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
 
 import java.awt.*;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,7 +86,6 @@ public class ChatTabsConfigBase {
     }
 
     public List<ChatTab> getVisibleChatTabs() {
-        // Базовая реализация без платформо-специфичной логики
         return chatTabs.stream().filter(ChatTab::isVisibleByDefault).toList();
     }
 
@@ -105,15 +100,21 @@ public class ChatTabsConfigBase {
         return chatTabs.get(selectedTab - 1);
     }
 
+    public boolean shouldSaveGenerated() {
+        return saveGenerated;
+    }
+
+    public void setSaveGenerated(boolean saveGenerated) {
+        this.saveGenerated = saveGenerated;
+    }
+
     public void addChatTabFirst(ChatTab newTab) {
         chatTabs.add(0, newTab);
     }
 
     public void save() {
-        // Сохранение будет реализовано в платформо-специфичных классах
     }
 
     public void load() {
-        // Загрузка будет реализована в платформо-специфичных классах
     }
 }

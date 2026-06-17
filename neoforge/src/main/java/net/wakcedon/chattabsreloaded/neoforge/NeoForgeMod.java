@@ -1,22 +1,22 @@
 package net.wakcedon.chattabsreloaded.neoforge;
 
 import net.wakcedon.chattabsreloaded.ChatTabs;
-import net.wakcedon.chattabsreloaded.config.NeoForgeConfig;
+import net.wakcedon.chattabsreloaded.config.NeoForgeChatTabsConfig;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLPaths;
 
 @Mod("chattabs_reloaded")
 public class NeoForgeMod {
 
-    private static NeoForgeConfig config;
+    private static NeoForgeChatTabsConfig config;
 
     public NeoForgeMod() {
         ChatTabs.init();
-        config = new NeoForgeConfig(FMLPaths.CONFIGDIR.get().resolve("chattabs.json").toString());
+        config = new NeoForgeChatTabsConfig(FMLPaths.CONFIGDIR.get().resolve("chattabs.json"));
         config.load();
     }
 
-    public static NeoForgeConfig getConfig() {
+    public static NeoForgeChatTabsConfig getConfig() {
         return config;
     }
 }

@@ -2,6 +2,7 @@ package net.wakcedon.chattabsreloaded.mixin;
 
 import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import net.wakcedon.chattabsreloaded.mixininterface.IChatHud;
+import net.wakcedon.chattabsreloaded.tabs.ChatTab;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.CommandSuggestions;
 import net.minecraft.client.gui.screens.ChatScreen;
@@ -18,27 +19,31 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ChatScreen.class)
 public abstract class MixinChatScreen extends Screen {
-    
+
     @Shadow
     private CommandSuggestions commandSuggestions;
-    
+
     @Shadow
     protected abstract boolean insertionClickMode();
-    
+
     protected MixinChatScreen(Component title) {
         super(title);
     }
-    
+
     @Inject(method = "render", at = @At("TAIL"))
     private void renderChatContextMenu(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         ((IChatHud)this.minecraft.gui.getChat()).chatTabs$renderContextMenu(context, width, height, mouseX, mouseY, deltaTicks);
     }
-    
+
     @Redirect(method = "handleChatInput", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendChat(Ljava/lang/String;)V"))
     private void modifyChatMessage(ClientPacketListener instance, String content) {
-        if(ChatTabsConfigBase.getInstance().enabled && ChatTabsConfigBase.getInstance().selectedTab > 0) {
-            content = ChatTabsConfigBase.getInstance().getSelectedChatTab().modifySend(content);
-            if (content.startsWith("/")) {
+        ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
+        if(config.enabled && config.selectedTab > 0) {
+            ChatTab selectedTab = config.getSelectedChatTab();
+            if(selectedTab != null) {
+                content = selectedTab.modifySend(content);
+            }
+            if(content.startsWith("/")) {
                 instance.sendCommand(content.substring(1));
             } else {
                 instance.sendChat(content);
@@ -47,27 +52,25 @@ public abstract class MixinChatScreen extends Screen {
             instance.sendChat(content);
         }
     }
-    
+
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     public void mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         if(((IChatHud)this.minecraft.gui.getChat()).chatTabs$mouseClicked(mouseX, mouseY, button)) {
             cir.setReturnValue(true);
         }
     }
-    
-    @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+
+    @Inject(method = "mouseReleased", at = @At("HEAD"), cancellable = true)
+    public void mouseReleased(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         if(((IChatHud)this.minecraft.gui.getChat()).chatTabs$mouseReleased(mouseX, mouseY, button)) {
-            return true;
+            cir.setReturnValue(true);
         }
-        return super.mouseReleased(mouseX, mouseY, button);
     }
-    
-    @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+
+    @Inject(method = "mouseDragged", at = @At("HEAD"), cancellable = true)
+    public void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY, CallbackInfoReturnable<Boolean> cir) {
         if(((IChatHud)this.minecraft.gui.getChat()).chatTabs$mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
-            return true;
+            cir.setReturnValue(true);
         }
-        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 }

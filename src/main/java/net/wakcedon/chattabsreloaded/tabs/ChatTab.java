@@ -26,7 +26,7 @@ public class ChatTab {
     private final Deque<ChatLine> visibleLines = new LinkedList<>();
     
     private boolean firstMessageUnread = true;
-    private ChatLine lastSeenLine;
+    private int messagesAtLastSeen = 0;
     
     public ChatTab(String id, String name, boolean save, boolean visibleByDefault, ChatLineFilter filter, SendModifier sendModifier) {
         this.id = id;
@@ -106,13 +106,10 @@ public class ChatTab {
     
     public void setFocused(boolean focused) {
         if(focused) {
-            lastSeenLine = null;
-            firstMessageUnread = false;
-        } else if(!visibleLines.isEmpty()) {
-            lastSeenLine = visibleLines.getFirst();
             firstMessageUnread = false;
         } else {
-            firstMessageUnread = true;
+            messagesAtLastSeen = visibleLines.size();
+            firstMessageUnread = false;
         }
     }
     
@@ -127,31 +124,18 @@ public class ChatTab {
     public void clear(boolean totalClear) {
         visibleLines.clear();
         firstMessageUnread = true;
+        messagesAtLastSeen = 0;
     }
     
     public int getLastSeenMessage() {
-        if(firstMessageUnread) return visibleLines.size() - 1;
-        if(lastSeenLine == null) return 0;
-        int index = 0;
-        for(ChatLine line : visibleLines) {
-            if(line.equals(lastSeenLine)) {
-                return index;
-            }
-            index++;
-        }
-        return 0;
+        if(firstMessageUnread) return Math.max(0, visibleLines.size() - 1);
+        int unreadCount = Math.max(0, visibleLines.size() - messagesAtLastSeen);
+        return Math.max(0, unreadCount - 1);
     }
     
     public boolean hasUnreads() {
-        if(lastSeenLine != null) {
-            int seenIndex = 0;
-            for(ChatLine line : visibleLines) {
-                if(line.equals(lastSeenLine)) {
-                    return seenIndex > 0;
-                }
-                seenIndex++;
-            }
-        }
-        return !visibleLines.isEmpty() && firstMessageUnread;
+        if(visibleLines.isEmpty()) return false;
+        if(firstMessageUnread) return true;
+        return visibleLines.size() > messagesAtLastSeen;
     }
 }

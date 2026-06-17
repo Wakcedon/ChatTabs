@@ -1,8 +1,6 @@
 package net.wakcedon.chattabsreloaded.tabs;
 
 import com.google.gson.annotations.Expose;
-import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.network.chat.TextColor;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.PatternSyntaxException;
@@ -34,9 +32,7 @@ public class ChatLineFilter {
             try {
                 boolean colorMatches = matchesLineColor(line);
                 if(filterMessages) {
-                    // Для платформо-специфичной логики фильтрации сообщений
-                    // нужно использовать реализации в Fabric/Neo версиях
-                    return false;
+                    return line.getContent().toLowerCase(java.util.Locale.ROOT).contains(regex.toLowerCase(java.util.Locale.ROOT)) && colorMatches;
                 }
                 return line.getContent().matches(regex) && colorMatches;
             } catch(PatternSyntaxException e) {
@@ -47,10 +43,39 @@ public class ChatLineFilter {
     }
     
     private boolean matchesLineColor(ChatLine line) {
-        boolean colorMatches = true;
-        // Для платформо-специфичной логики цвета
-        // нужно использовать реализации в Fabric/Neo версиях
-        return colorMatches;
+        if(colorFilter == ColorFilter.DISABLED) return true;
+        int lineColor = extractFirstColor(line.getContent());
+        if(lineColor == -1) return colorFilter == ColorFilter.DISABLED;
+        return switch(colorFilter) {
+            case HEX -> lineColor == hexColor;
+            case DISABLED -> true;
+            default -> lineColor == colorFilter.getColor();
+        };
+    }
+    
+    private int extractFirstColor(String text) {
+        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("\\u00A7([0-9a-fklmnor])").matcher(text);
+        if(!matcher.find()) return -1;
+        String code = matcher.group(1);
+        return switch(code) {
+            case "0" -> 0x000000;
+            case "1" -> 0x0000AA;
+            case "2" -> 0x00AA00;
+            case "3" -> 0x00AAAA;
+            case "4" -> 0xAA0000;
+            case "5" -> 0xAA00AA;
+            case "6" -> 0xFFAA00;
+            case "7" -> 0xAAAAAA;
+            case "8" -> 0x555555;
+            case "9" -> 0x5555FF;
+            case "a" -> 0x55FF55;
+            case "b" -> 0x55FFFF;
+            case "c" -> 0xFF5555;
+            case "d" -> 0xFF55FF;
+            case "e" -> 0xFFFF55;
+            case "f" -> 0xFFFFFF;
+            default -> -1;
+        };
     }
     
     public ChatLineFilter(String filter, boolean filterMessages) {

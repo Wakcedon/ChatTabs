@@ -7,17 +7,17 @@ import net.wakcedon.chattabsreloaded.ChatTabs;
 import net.wakcedon.chattabsreloaded.profiles.ServerProfile;
 import net.wakcedon.chattabsreloaded.tabs.ChatLineFilter;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
-import net.neoforged.fml.loading.FMLPaths;
+import net.minecraft.client.Minecraft;
 
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
-public class NeoForgeChatTabsConfig extends ChatTabsConfigBase {
+public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements PlatformConfig {
 
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
@@ -28,100 +28,102 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase {
             .setLenient()
             .create();
 
-    private static NeoForgeChatTabsConfig INSTANCE;
+    private final Path configPath;
 
-    public static NeoForgeChatTabsConfig getInstance() {
-        if (INSTANCE == null) {
-            try {
-                loadConfig();
-            } catch (Throwable t) {
-                INSTANCE = new NeoForgeChatTabsConfig();
-            }
-        }
-        return INSTANCE;
+    public NeoForgeChatTabsConfig(Path configPath) {
+        this.configPath = configPath;
+        ChatTabsConfigBase.setPlatformConfig(this);
     }
 
-    private static void loadConfig() {
-        Path cfg = getConfigFile();
+    @Override
+    public void load() {
         try {
-            if (Files.exists(cfg)) {
-                String json = Files.readString(cfg);
-                NeoForgeChatTabsConfig cfgObj = GSON.fromJson(json, NeoForgeChatTabsConfig.class);
-                if (cfgObj == null) cfgObj = new NeoForgeChatTabsConfig();
-                INSTANCE = cfgObj;
-                return;
+            if(Files.exists(configPath)) {
+                String json = Files.readString(configPath);
+                NeoForgeChatTabsConfig loaded = GSON.fromJson(json, NeoForgeChatTabsConfig.class);
+                if(loaded != null) {
+                    applyFrom(loaded);
+                    ChatTabsConfigBase.setPlatformConfig(this);
+                    return;
+                }
             }
-        } catch (Throwable ignored) {}
-        INSTANCE = new NeoForgeChatTabsConfig();
+        } catch(Throwable t) {
+            ChatTabs.LOGGER.warning("Failed to load config: " + t.getMessage());
+        }
+        ChatTabsConfigBase.setPlatformConfig(this);
     }
 
     @Override
     public void save() {
         try {
-            Path cfg = getConfigFile();
-            Files.createDirectories(cfg.getParent());
+            Files.createDirectories(configPath.getParent());
             String json = GSON.toJson(this);
-            Files.writeString(cfg, json, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
-        } catch (IOException ignored) {}
+            Files.writeString(configPath, json, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+        } catch(IOException e) {
+            ChatTabs.LOGGER.warning("Failed to save config: " + e.getMessage());
+        }
     }
 
-    private static Path getConfigFile() {
-        return FMLPaths.CONFIGDIR.get().resolve("chattabs.json");
+    @Override
+    public String getConfigPath() {
+        return configPath.toString();
+    }
+
+    @Override
+    public ChatTabsConfigBase getConfig() {
+        return this;
     }
 
     @Override
     public List<ChatTab> getVisibleChatTabs() {
         String serverIp = getCurrentServerIp();
-        if (serverIp == null) return super.getVisibleChatTabs();
-        List<ServerProfile> matchingProfiles = serverProfiles.stream()
-                .filter(profile -> serverIp.endsWith(profile.getServerAddress()))
-                .sorted((a, b) -> {
-                    int ac = serverIp.compareTo(a.getServerAddress());
-                    int bc = serverIp.compareTo(b.getServerAddress());
-                    return Integer.compare(ac, bc);
-                }).toList();
-        if (matchingProfiles.isEmpty()) return super.getVisibleChatTabs();
-        return matchingProfiles.get(matchingProfiles.size() - 1).getTabs();
+        if(serverIp == null) return super.getVisibleChatTabs();
+        ServerProfile bestProfile = findBestProfile(serverIp);
+        if(bestProfile == null) return super.getVisibleChatTabs();
+        return bestProfile.getTabs();
     }
 
     @Override
     public void addChatTabFirst(ChatTab newTab) {
         super.addChatTabFirst(newTab);
         String serverIp = getCurrentServerIp();
-        if (serverIp != null) {
-            ServerProfile profile = getCurrentServerProfile();
-            if (profile != null) profile.addTabId(newTab.getId());
+        if(serverIp != null) {
+            ServerProfile profile = findBestProfile(serverIp);
+            if(profile != null) profile.addTabId(newTab.getId());
         }
     }
 
-    private ServerProfile getCurrentServerProfile() {
-        String serverIp = getCurrentServerIp();
-        if (serverIp == null) return null;
-        List<ServerProfile> matchingProfiles = serverProfiles.stream()
+    private ServerProfile findBestProfile(String serverIp) {
+        return serverProfiles.stream()
                 .filter(profile -> serverIp.endsWith(profile.getServerAddress()))
-                .sorted((a, b) -> {
-                    int ac = serverIp.compareTo(a.getServerAddress());
-                    int bc = serverIp.compareTo(b.getServerAddress());
-                    return Integer.compare(ac, bc);
-                }).toList();
-        if (matchingProfiles.isEmpty()) return null;
-        return matchingProfiles.get(matchingProfiles.size() - 1);
+                .max(Comparator.comparingInt(p -> p.getServerAddress().length()))
+                .orElse(null);
     }
 
-    private String getCurrentServerIp() {
-        try {
-            Class<?> mc = Class.forName("net.minecraft.client.Minecraft");
-            Object instance = mc.getMethod("getInstance").invoke(null);
-            if (instance == null) return null;
-            Object serverData = instance.getClass().getMethod("getCurrentServer").invoke(instance);
-            if (serverData == null) return null;
-            try {
-                return (String) serverData.getClass().getField("ip").get(serverData);
-            } catch (NoSuchFieldException e) {
-                return (String) serverData.getClass().getMethod("address").invoke(serverData);
-            }
-        } catch (Throwable t) {
-            return null;
-        }
+    private static String getCurrentServerIp() {
+        Minecraft mc = Minecraft.getInstance();
+        if(mc.getCurrentServer() == null) return null;
+        return mc.getCurrentServer().ip;
+    }
+
+    private void applyFrom(NeoForgeChatTabsConfig other) {
+        this.enabled = other.enabled;
+        this.maxLines = other.maxLines;
+        this.previewTime = other.previewTime;
+        this.clearHistory = other.clearHistory;
+        this.textShadow = other.textShadow;
+        this.bgColor = other.bgColor;
+        this.bgColorHovered = other.bgColorHovered;
+        this.selectedTabColor = other.selectedTabColor;
+        this.unreadColor = other.unreadColor;
+        this.chatWidth = other.chatWidth;
+        this.chatHeightUnfocused = other.chatHeightUnfocused;
+        this.chatHeightFocused = other.chatHeightFocused;
+        this.autoGenerateMsgTabs = other.autoGenerateMsgTabs;
+        this.selectedTab = other.selectedTab;
+        this.getChatTabs().clear();
+        this.getChatTabs().addAll(other.getChatTabs());
+        this.serverProfiles.clear();
+        this.serverProfiles.addAll(other.serverProfiles);
     }
 }

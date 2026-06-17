@@ -71,12 +71,13 @@ public class ChatContextMenu {
                     boolean hovered = mouseX >= x && mouseY >= ey && mouseX < x + width && mouseY < ey + ELEMENT_HEIGHT;
                     if(hovered) {
                         element.handleClick();
+                        return true;
                     }
                     ey += ELEMENT_HEIGHT;
                 }
             }
         }
-        return true;
+        return false;
     }
     
     public static class Element {
@@ -110,7 +111,9 @@ public class ChatContextMenu {
         }
         
         public void handleClick() {
-            clickHandler.run();
+            if(clickHandler != null) {
+                clickHandler.run();
+            }
         }
     }
 }

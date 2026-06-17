@@ -1,27 +1,41 @@
 package net.wakcedon.chattabsreloaded.tabs;
 
-// Для NeoForge нам нужно будет использовать соответствующие классы
-// Это будет реализация для NeoForge платформы
+import net.minecraft.network.chat.Component;
+
 public class NeoForgeChatLine implements ChatLine {
-    private final Object line; // Будет содержать NeoForge-специфичный объект
+    private final Component content;
+    private final boolean system;
 
     public NeoForgeChatLine(Object line) {
-        this.line = line;
+        Component comp = extractComponent(line);
+        this.content = comp != null ? comp : Component.literal(line.toString());
+        this.system = comp == null;
+    }
+
+    public NeoForgeChatLine(Component content, boolean system) {
+        this.content = content;
+        this.system = system;
     }
 
     @Override
     public String getContent() {
-        // Здесь будет логика для извлечения контента из NeoForge объекта
-        return line.toString();
+        return content.getString();
     }
 
     @Override
     public boolean isSystem() {
-        // Здесь будет логика для определения системного сообщения в NeoForge
-        return false;
+        return system;
     }
 
-    public Object getLine() {
-        return line;
+    public Component getComponent() {
+        return content;
+    }
+
+    private static Component extractComponent(Object line) {
+        try {
+            Object result = line.getClass().getMethod("content").invoke(line);
+            if(result instanceof Component c) return c;
+        } catch(Exception ignored) {}
+        return null;
     }
 }
