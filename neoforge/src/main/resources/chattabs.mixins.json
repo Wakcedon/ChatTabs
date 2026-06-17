@@ -4,7 +4,6 @@
   "package": "net.wakcedon.chattabsreloaded.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "MixinChatHud$Interactable",
     "MixinChatHud",
     "MixinChatScreen"
   ],
