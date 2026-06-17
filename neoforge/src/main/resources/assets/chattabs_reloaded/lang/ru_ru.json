@@ -67,6 +67,6 @@
   "chattabsconfig.chattab.visiblebydefault.tooltip": "Если включено — вкладка будет показана, когда нет профиля сервера. Иначе — только если профиль сервера включает эту вкладку.",
 
   "chattabs.tab.all": "Все",
-  "chattabs.tab.global": "Общий чат",
-  "chattabs.tab.local": "Локальный чат"
+  "chattabs.tab.global": "Глобальный",
+  "chattabs.tab.local": "Локальный"
 }
