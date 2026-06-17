@@ -4,7 +4,6 @@ import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import net.wakcedon.chattabsreloaded.mixininterface.IChatHud;
 import net.wakcedon.chattabsreloaded.render.ChatContextMenu;
 import net.wakcedon.chattabsreloaded.render.ChatHudOverlays;
-import net.wakcedon.chattabsreloaded.render.screen.EditChatScreen;
 import net.wakcedon.chattabsreloaded.tabs.ChatLine;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
 import net.wakcedon.chattabsreloaded.tabs.NeoForgeChatLine;
@@ -37,7 +36,7 @@ public abstract class MixinChatHud implements IChatHud {
     @Unique
     private void chattabs$renderTabs(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         Minecraft client = Minecraft.getInstance();
-        if(client.screen instanceof EditChatScreen) return;
+        if(client.screen != null) return;
 
         ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
         if(!config.enabled) return;
