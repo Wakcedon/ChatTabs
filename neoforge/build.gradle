@@ -57,7 +57,7 @@ neoForge {
     }
 
     mods {
-        chattabs {
+        "chattabs-reloaded" {
             sourceSet sourceSets.main
         }
     }
