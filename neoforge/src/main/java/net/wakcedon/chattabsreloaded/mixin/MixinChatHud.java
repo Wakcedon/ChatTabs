@@ -36,7 +36,7 @@ public abstract class MixinChatHud implements IChatHud {
         if(!config.enabled) return;
 
         int windowHeight = client.getWindow().getGuiScaledHeight();
-        float chatScale = client.options.chatScale().get();
+        float chatScale = client.options.chatScale().get().floatValue();
         boolean mcTabUnreads = false;
 
         int[] result = ChatHudOverlays.renderChatTabs(
