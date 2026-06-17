@@ -43,6 +43,17 @@ sourceSets {
     }
 }
 
+processResources {
+    var replaceProperties = [
+            mod_version: version,
+    ]
+    inputs.properties replaceProperties
+
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand replaceProperties
+    }
+}
+
 neoForge {
     version = rootProject.neoForge_version
     validateAccessTransformers = false
