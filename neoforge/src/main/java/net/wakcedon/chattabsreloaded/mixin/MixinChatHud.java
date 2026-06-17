@@ -29,8 +29,18 @@ public abstract class MixinChatHud implements IChatHud {
     @Unique
     private ChatContextMenu chattabs$contextMenu;
 
-    @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIIZ)V", at = @At("TAIL"))
+    @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIIZ)V", at = @At("TAIL"), require = 0)
     private void chattabs$onRender(GuiGraphics guiGraphics, int tickCount, int mouseX, int mouseY, boolean focused, CallbackInfo ci) {
+        chattabs$renderTabs(guiGraphics, mouseX, mouseY);
+    }
+
+    @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", at = @At("TAIL"))
+    private void chattabs$onRenderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        chattabs$renderTabs(guiGraphics, mouseX, mouseY);
+    }
+
+    @Unique
+    private void chattabs$renderTabs(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         Minecraft client = Minecraft.getInstance();
         if(client.screen instanceof EditChatScreen) return;
 

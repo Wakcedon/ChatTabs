@@ -5,7 +5,7 @@ import net.wakcedon.chattabsreloaded.config.NeoForgeChatTabsConfig;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLPaths;
 
-@Mod("chattabs_reloaded")
+@Mod(value = "chattabs_reloaded", mixinConfig = "chattabs.mixins.json")
 public class NeoForgeMod {
 
     private static NeoForgeChatTabsConfig config;
