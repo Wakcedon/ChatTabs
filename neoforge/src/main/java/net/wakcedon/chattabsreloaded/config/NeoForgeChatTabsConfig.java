@@ -68,10 +68,10 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
                 new ChatLineFilter(".*"),
                 new SendModifier()));
         defaults.add(new ChatTab("tab.global", "chattabs.tab.global", true, true,
-                new ChatLineFilter(".*\\[(Global|G(?![a-zA-Z])|GLOBAL|Глобальный чат|глобальный чат|Глобал|глобал|ГЛОБАЛ|Global Chat|GlobalChat|GC(?![a-zA-Z])|World|W(?![a-zA-Z])|WORLD|Public|PUBLIC|All|ГЧ|гч|Server|Broadcast|Announcement).*"),
-                new SendModifier()));
+                new ChatLineFilter("!", true),
+                new SendModifier("!")));
         defaults.add(new ChatTab("tab.local", "chattabs.tab.local", true, true,
-                new ChatLineFilter("(<[^>]+>.*)|(.*\\[(Local|L(?![a-zA-Z])|LOCAL|Локальный|локальный|Локал|локал|ЛОКАЛ|Local Chat|LocalChat|LC|ЛЧ|лч).*)"),
+                new ChatLineFilter("^[^!]*$", false),
                 new SendModifier()));
         getChatTabs().addAll(defaults);
         ChatTabs.LOGGER.info("Created 3 default tabs");

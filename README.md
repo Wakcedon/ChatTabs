@@ -14,7 +14,9 @@ Supported loaders and versions
 
 Supported languages
 - English (default)
-- Russian (included)
+- Russian
+- Spanish
+- Chinese (Simplified)
 
 Quick links
 - Russian README: [README.ru.md](README.ru.md)
@@ -39,6 +41,8 @@ Outputs
 - `neoforge/build/libs/` — NeoForge mod JAR
 
 Translations
-- Russian locale is included at `neoforge/src/main/resources/assets/chattabs_reloaded/lang/ru_ru.json`.
+- Russian: `neoforge/src/main/resources/assets/chattabs_reloaded/lang/ru_ru.json`
+- Spanish: `neoforge/src/main/resources/assets/chattabs_reloaded/lang/es_es.json`
+- Chinese (Simplified): `neoforge/src/main/resources/assets/chattabs_reloaded/lang/zh_cn.json`
 
 If you'd like to help translate or contribute, see CONTRIBUTING.md.

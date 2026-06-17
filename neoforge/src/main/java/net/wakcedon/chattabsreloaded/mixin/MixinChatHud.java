@@ -14,13 +14,20 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Mixin(ChatComponent.class)
 public abstract class MixinChatHud implements IChatHud {
+
+    @Shadow
+    private List<?> trimmedMessages;
 
     @Unique
     private int chattabs$tabScroll = -1;
@@ -28,6 +35,8 @@ public abstract class MixinChatHud implements IChatHud {
     private int chattabs$hoveredTab = -1;
     @Unique
     private ChatContextMenu chattabs$contextMenu;
+    @Unique
+    private List<?> chattabs$savedTrimmedMessages;
 
     @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIIZ)V", at = @At("TAIL"))
     private void chattabs$onRender(GuiGraphics guiGraphics, int tickCount, int mouseX, int mouseY, boolean focused, CallbackInfo ci) {
@@ -36,21 +45,30 @@ public abstract class MixinChatHud implements IChatHud {
 
     @Unique
     private void chattabs$renderTabs(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        Minecraft client = Minecraft.getInstance();
-        if(client.screen != null) return;
+    }
 
+    @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIIZ)V", at = @At("HEAD"))
+    private void chattabs$filterBeforeRender(GuiGraphics guiGraphics, int tickCount, int mouseX, int mouseY, boolean focused, CallbackInfo ci) {
         ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
         if(!config.enabled) return;
 
-        int windowHeight = client.getWindow().getGuiScaledHeight();
-        float chatScale = client.options.chatScale().get().floatValue();
+        ChatTab selectedTab = config.getSelectedChatTab();
+        if(selectedTab == null) return;
 
-        int[] result = ChatHudOverlays.renderChatTabs(
-            client, chattabs$tabScroll, guiGraphics, windowHeight, chatScale,
-            true, config.chatWidth, mouseX, mouseY, 0, false, 40
-        );
-        chattabs$hoveredTab = result[0];
-        chattabs$tabScroll = result[1];
+        chattabs$savedTrimmedMessages = new ArrayList<>(this.trimmedMessages);
+        this.trimmedMessages.removeIf(line -> {
+            NeoForgeChatLine wrapped = new NeoForgeChatLine(line);
+            return !selectedTab.getFilter().test(wrapped);
+        });
+    }
+
+    @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIIZ)V", at = @At("RETURN"))
+    private void chattabs$restoreAfterRender(GuiGraphics guiGraphics, int tickCount, int mouseX, int mouseY, boolean focused, CallbackInfo ci) {
+        if(chattabs$savedTrimmedMessages != null) {
+            this.trimmedMessages.clear();
+            this.trimmedMessages.addAll(chattabs$savedTrimmedMessages);
+            chattabs$savedTrimmedMessages = null;
+        }
     }
 
     @Inject(method = "addMessage(Lnet/minecraft/network/chat/Component;)V", at = @At("HEAD"))

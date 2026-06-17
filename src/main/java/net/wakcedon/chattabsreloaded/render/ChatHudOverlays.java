@@ -16,9 +16,9 @@ public class ChatHudOverlays {
         if(!config.enabled || config.getVisibleChatTabs().isEmpty() || chatScale == 0) return new int[]{hoveredTab, tabScroll};
         
         int height = 13;
-        int x = 0;
+        int x = 4;
         int y = Mth.floor((windowHeight - baseYOffset) / chatScale);
-        y -= ((messages * (int)(9 * (client.options.chatLineSpacing().get() + 1))) + height);
+        y -= ((messages * (int)(9 * (client.options.chatLineSpacing().get() + 1))) + height + 4);
         int scrollerWidth = client.font.width("<") + 4;
         int tabNum = 0;
         int width;
