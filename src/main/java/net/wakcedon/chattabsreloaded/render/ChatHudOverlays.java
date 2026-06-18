@@ -60,21 +60,13 @@ public class ChatHudOverlays {
                 break;
             }
             hovered = (mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height) && !(client.screen instanceof EditChatScreen);
+            if(config.selectedTab == tabNum) {
+                fillRoundedRect(context, x - 1, y - 1, width + 2, height + 2, config.selectedTabColor.getRGB());
+            } else if(tab.hasUnreads()) {
+                fillRoundedRect(context, x - 1, y - 1, width + 2, height + 2, config.unreadColor.getRGB());
+            }
             fillRoundedRect(context, x, y, width, height, hovered ? config.bgColorHovered.getRGB() : config.bgColor.getRGB());
             context.drawString(client.font, tabName.getString(), x + 3, y + 2, -1, config.textShadow);
-            if(config.selectedTab == tabNum) {
-                int c = config.selectedTabColor.getRGB();
-                context.fill(x + 2, y - 1, x + width - 2, y, c);
-                context.fill(x + 2, y + height, x + width - 2, y + height + 1, c);
-                context.fill(x - 1, y + 2, x, y + height - 2, c);
-                context.fill(x + width, y + 2, x + width + 1, y + height - 2, c);
-            } else if(tab.hasUnreads()) {
-                int c = config.unreadColor.getRGB();
-                context.fill(x + 2, y - 1, x + width - 2, y, c);
-                context.fill(x + 2, y + height, x + width - 2, y + height + 1, c);
-                context.fill(x - 1, y + 2, x, y + height - 2, c);
-                context.fill(x + width, y + 2, x + width + 1, y + height - 2, c);
-            }
             if(hovered) {
                 hoveredTab = tabNum;
             }

@@ -19,7 +19,7 @@ public class NeoForgeChatLine implements ChatLine {
 
     @Override
     public String getContent() {
-        return content.getString();
+        return content.getString().replaceAll("\u00A7[0-9a-fklmnor]", "");
     }
 
     @Override

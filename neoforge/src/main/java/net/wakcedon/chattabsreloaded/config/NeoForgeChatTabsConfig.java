@@ -100,7 +100,7 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         String globalCircled = String.join("|", GLOBAL_CIRCLED);
         String localTags = String.join("|", LOCAL_TAGS);
         String localCircled = String.join("|", LOCAL_CIRCLED);
-        return "^(?![!?])(?!.*(?:" + globalCircled + "))(?!.*\\[(?:" + globalTags + ")\\])(?:.*(?:" + localCircled + ").*|.*\\[(?:" + localTags + ")\\].*|.*: .*)";
+        return "^(?![!?])(?!.*(?:" + globalCircled + "))(?!.*\\[(?:" + globalTags + ")\\])(?:.*(?:" + localCircled + ").*|.*\\[(?:" + localTags + ")\\].*|.*: .*|.*<[^>]+>.*)";
     }
 
     private void createDefaultTabs() {
