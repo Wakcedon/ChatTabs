@@ -12,9 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
-import net.minecraft.client.GuiMessageTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MessageSignature;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -119,18 +117,8 @@ public abstract class MixinChatHud implements IChatHud {
         }
     }
 
-    @Inject(method = "addClientSystemMessage(Lnet/minecraft/network/chat/Component;)V", at = @At("HEAD"))
-    private void chattabs$onClientSystemMessage(Component message, CallbackInfo ci) {
-        chattabs$processMessage(message);
-    }
-
-    @Inject(method = "addServerSystemMessage(Lnet/minecraft/network/chat/Component;)V", at = @At("HEAD"))
-    private void chattabs$onServerSystemMessage(Component message, CallbackInfo ci) {
-        chattabs$processMessage(message);
-    }
-
-    @Inject(method = "addPlayerMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V", at = @At("HEAD"))
-    private void chattabs$onPlayerMessage(Component message, MessageSignature signature, GuiMessageTag tag, CallbackInfo ci) {
+    @Inject(method = "addMessage(Lnet/minecraft/network/chat/Component;)V", at = @At("HEAD"))
+    private void chattabs$onAddMessage(Component message, CallbackInfo ci) {
         chattabs$processMessage(message);
     }
 
