@@ -66,6 +66,8 @@
   "chattabsconfig.chatheightfocused": "Высота чата (активный)",
   "chattabsconfig.chatheightunfocused": "Высота чата (неактивный)",
   "chattabsconfig.contextmenu.tab.newtab": "Новая вкладка",
+  "chattabsconfig.contextmenu.tab.edit": "Редактировать вкладку",
+  "chattabs.tabedit.title": "Редактирование вкладки",
   "chattabsconfig.chattab.id": "Идентификатор",
   "chattabsconfig.serverprofiles": "Профили серверов",
   "chattabsconfig.serverprofile.serveraddress": "Адрес сервера",

@@ -66,6 +66,8 @@
   "chattabsconfig.chatheightfocused": "Chat Height (Focused)",
   "chattabsconfig.chatheightunfocused": "Chat Height (Unfocused)",
   "chattabsconfig.contextmenu.tab.newtab": "New Tab",
+  "chattabsconfig.contextmenu.tab.edit": "Edit Tab",
+  "chattabs.tabedit.title": "Edit Tab",
   "chattabsconfig.chattab.id": "Id",
   "chattabsconfig.serverprofiles": "Server Profiles",
   "chattabsconfig.serverprofile.serveraddress": "Server Address",

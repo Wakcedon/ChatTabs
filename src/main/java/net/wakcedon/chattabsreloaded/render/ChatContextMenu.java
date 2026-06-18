@@ -45,6 +45,8 @@ public class ChatContextMenu {
             }
         }
         
+        context.pose().pushPose();
+        context.pose().translate(0.0f, 0.0f, 200.0f);
         context.fill(x - 1, y - 1, x + this.width + 1, y + height + 1, -1);
         context.fill(x, y, x + this.width, y + height, 0xFF000000);
         int ey = y;
@@ -59,6 +61,7 @@ public class ChatContextMenu {
                 ey += ELEMENT_HEIGHT;
             }
         }
+        context.pose().popPose();
     }
     
     public boolean click(double mouseX, double mouseY, int button) {

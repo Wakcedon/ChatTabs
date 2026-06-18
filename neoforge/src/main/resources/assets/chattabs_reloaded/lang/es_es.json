@@ -66,6 +66,8 @@
   "chattabsconfig.chatheightfocused": "Altura del chat (enfocado)",
   "chattabsconfig.chatheightunfocused": "Altura del chat (no enfocado)",
   "chattabsconfig.contextmenu.tab.newtab": "Nueva pestaña",
+  "chattabsconfig.contextmenu.tab.edit": "Editar pestaña",
+  "chattabs.tabedit.title": "Editar pestaña",
   "chattabsconfig.chattab.id": "Id",
   "chattabsconfig.serverprofiles": "Perfiles de servidor",
   "chattabsconfig.serverprofile.serveraddress": "Dirección del servidor",

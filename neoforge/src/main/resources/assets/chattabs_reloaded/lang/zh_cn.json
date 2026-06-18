@@ -66,6 +66,8 @@
   "chattabsconfig.chatheightfocused": "聊天高度（聚焦）",
   "chattabsconfig.chatheightunfocused": "聊天高度（未聚焦）",
   "chattabsconfig.contextmenu.tab.newtab": "新建标签",
+  "chattabsconfig.contextmenu.tab.edit": "编辑标签",
+  "chattabs.tabedit.title": "编辑标签",
   "chattabsconfig.chattab.id": "标识符",
   "chattabsconfig.serverprofiles": "服务器配置文件",
   "chattabsconfig.serverprofile.serveraddress": "服务器地址",

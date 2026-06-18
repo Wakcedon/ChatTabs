@@ -18,11 +18,11 @@ public class ChatHudOverlays {
         return (a << 24) | (color & 0x00FFFFFF);
     }
 
-    private static void fillRoundedRect(GuiGraphics ctx, int x, int y, int w, int h, int color) {
+    public static void fillRoundedRect(GuiGraphics ctx, int x, int y, int w, int h, int color) {
         fillRoundedRect(ctx, x, y, w, h, color, 1.0f);
     }
 
-    private static void fillRoundedRect(GuiGraphics ctx, int x, int y, int w, int h, int color, float alpha) {
+    public static void fillRoundedRect(GuiGraphics ctx, int x, int y, int w, int h, int color, float alpha) {
         int c = applyAlpha(color, alpha);
         if (w < 4 || h < 4) { ctx.fill(x, y, x + w, y + h, c); return; }
         ctx.fill(x + 2, y, x + w - 2, y + h, c);

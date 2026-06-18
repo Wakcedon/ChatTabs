@@ -4,7 +4,9 @@ import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import net.wakcedon.chattabsreloaded.mixininterface.IChatHud;
 import net.wakcedon.chattabsreloaded.render.ChatContextMenu;
 import net.wakcedon.chattabsreloaded.render.ChatHudOverlays;
+import net.wakcedon.chattabsreloaded.render.GhostTab;
 import net.wakcedon.chattabsreloaded.render.screen.EditChatScreen;
+import net.wakcedon.chattabsreloaded.render.screen.TabEditScreen;
 import net.wakcedon.chattabsreloaded.tabs.ChatLine;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
 import net.wakcedon.chattabsreloaded.tabs.NeoForgeChatLine;
@@ -56,9 +58,37 @@ public abstract class MixinChatHud implements IChatHud {
     @Unique
     private float chattabs$animTarget = 0.0f;
 
+    @Unique
+    private float chattabs$chatSlideAnim = 0.0f;
+
+    @Unique
+    private final java.util.ArrayList<GhostTab> chattabs$removingTabs = new java.util.ArrayList<>();
+
     @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIIZ)V", at = @At("TAIL"))
     private void chattabs$onRender(GuiGraphics guiGraphics, int tickCount, int mouseX, int mouseY, boolean focused, CallbackInfo ci) {
+        chattabs$tickAnims();
         chattabs$renderTabs(guiGraphics, mouseX, mouseY);
+    }
+
+    @Unique
+    private void chattabs$tickAnims() {
+        Minecraft client = Minecraft.getInstance();
+        boolean chatOpen = client.screen instanceof net.minecraft.client.gui.screens.ChatScreen;
+
+        if(chatOpen && chattabs$chatSlideAnim < 1.0f) {
+            chattabs$chatSlideAnim = Math.min(chattabs$chatSlideAnim + 0.08f, 1.0f);
+        } else if(!chatOpen && chattabs$chatSlideAnim > 0.0f) {
+            chattabs$chatSlideAnim = Math.max(chattabs$chatSlideAnim - 0.08f, 0.0f);
+        }
+
+        java.util.Iterator<GhostTab> it = chattabs$removingTabs.iterator();
+        while(it.hasNext()) {
+            GhostTab gt = it.next();
+            gt.alpha -= 0.06f;
+            if(gt.alpha <= 0.0f) {
+                it.remove();
+            }
+        }
     }
 
     @Unique
@@ -91,6 +121,28 @@ public abstract class MixinChatHud implements IChatHud {
             client, chattabs$tabScroll, guiGraphics, windowHeight, chatScale,
             false, config.chatWidth, mouseX, mouseY, 0, false, 0, null, chattabs$animAlpha
         );
+
+        chattabs$renderGhostTabs(guiGraphics, client, windowHeight, chatScale, config.chatWidth, mouseX, mouseY);
+    }
+
+    @Unique
+    private void chattabs$renderGhostTabs(GuiGraphics ctx, Minecraft client, int windowHeight, float chatScale, int chatWidth, int mouseX, int mouseY) {
+        if(chattabs$removingTabs.isEmpty()) return;
+        float alpha = chattabs$animAlpha;
+        int x = 4 + 12 + 2;
+        int y = net.minecraft.util.Mth.floor(windowHeight / chatScale) - 17;
+        int height = 13;
+        for(GhostTab gt : chattabs$removingTabs) {
+            String name = "x " + gt.name;
+            int tw = client.font.width(name);
+            int w = tw + 8;
+            float a = alpha * gt.alpha;
+            if(a > 0.01f) {
+                ChatHudOverlays.fillRoundedRect(ctx, x, y, w, height, 0x44FF4444, a);
+                ctx.drawString(client.font, name, x + 3, y + 2, 0xFFFFFF | (Math.round(255 * a) << 24));
+            }
+            x += w + 4;
+        }
     }
 
     @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIIZ)V", at = @At("HEAD"))
@@ -162,7 +214,7 @@ public abstract class MixinChatHud implements IChatHud {
         if(chattabs$hoveredTab >= 0) {
             if(button == 1) {
                 chattabs$showTabContextMenu(client, (int)mouseX, (int)mouseY);
-            } else if(config.tabDragAndDrop && Screen.hasShiftDown()) {
+            } else if(config.tabDragAndDrop) {
                 java.util.List<ChatTab> visible = config.getVisibleChatTabs();
                 if(chattabs$hoveredTab < visible.size()) {
                     int actualIdx = config.getChatTabs().indexOf(visible.get(chattabs$hoveredTab));
@@ -204,6 +256,21 @@ public abstract class MixinChatHud implements IChatHud {
     @Override
     public void chatTabs$setAnimTarget(boolean visible) {
         chattabs$animTarget = visible ? 1.0f : 0.0f;
+    }
+
+    @Override
+    public float chatTabs$getChatSlideAnim() {
+        return chattabs$chatSlideAnim;
+    }
+
+    @Override
+    public void chatTabs$showRemoveAnim(String tabId, String tabName) {
+        chattabs$removingTabs.add(new GhostTab(tabId, tabName));
+    }
+
+    @Override
+    public java.util.List<GhostTab> chatTabs$getRemovingTabs() {
+        return chattabs$removingTabs;
     }
 
     @Override
@@ -314,6 +381,15 @@ public abstract class MixinChatHud implements IChatHud {
                 config.addChatTabFirst(new ChatTab());
                 chattabs$contextMenu = null;
             }),
+            new ChatContextMenu.Element(Component.translatable("chattabsconfig.contextmenu.tab.edit"), () -> {
+                if(hoveredTabAtCreation >= 0) {
+                    List<ChatTab> visibleTabs = config.getVisibleChatTabs();
+                    if(hoveredTabAtCreation < visibleTabs.size()) {
+                        Minecraft.getInstance().setScreen(new TabEditScreen(null, visibleTabs.get(hoveredTabAtCreation)));
+                    }
+                }
+                chattabs$contextMenu = null;
+            }),
             new ChatContextMenu.Element(),
             new ChatContextMenu.Element(Component.translatable("chattabsconfig.contextmenu.tab.delete"), () -> {
                 if(hoveredTabAtCreation >= 0) {
@@ -322,6 +398,7 @@ public abstract class MixinChatHud implements IChatHud {
                         ChatTab tab = visibleTabs.get(hoveredTabAtCreation);
                         int allIdx = config.getChatTabs().indexOf(tab);
                         if(allIdx >= 0) {
+                            chattabs$showRemoveAnim(tab.getId(), tab.getName());
                             config.getChatTabs().remove(allIdx);
                             if(config.selectedTab >= allIdx) config.selectedTab--;
                         }

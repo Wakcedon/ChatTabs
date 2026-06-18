@@ -40,14 +40,31 @@ public abstract class MixinChatScreen extends Screen {
     @Unique
     private int chattabs$hoveredTab = -1;
 
+    @Unique
+    private int chattabs$savedInputY;
+
     protected MixinChatScreen(Component title) {
         super(title);
+    }
+
+    @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", at = @At("HEAD"))
+    private void chattabs$onRenderHead(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        IChatHud chatHud = (IChatHud)this.minecraft.gui.getChat();
+        float slideAnim = chatHud.chatTabs$getChatSlideAnim();
+        if(slideAnim < 1.0f) {
+            chattabs$savedInputY = input.getY();
+            int slideOffset = (int)((1.0f - slideAnim) * 30);
+            input.setY(input.getY() + slideOffset);
+        }
     }
 
     @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", at = @At("TAIL"))
     private void renderChatContextMenu(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         ((IChatHud)this.minecraft.gui.getChat()).chatTabs$renderContextMenu(context, width, height, mouseX, mouseY, deltaTicks);
         chattabs$renderTabs(context, mouseX, mouseY);
+        if(((IChatHud)this.minecraft.gui.getChat()).chatTabs$getChatSlideAnim() < 1.0f) {
+            input.setY(chattabs$savedInputY);
+        }
     }
 
     @Unique
@@ -109,6 +126,21 @@ public abstract class MixinChatScreen extends Screen {
         }
 
         chatHud.chatTabs$setHoverState(chattabs$hoveredTab, chattabs$tabScroll);
+
+        float a = config.tabAnimationFade ? chatHud.chatTabs$getAnimAlpha() : 1.0f;
+        for(net.wakcedon.chattabsreloaded.render.GhostTab gt : chatHud.chatTabs$getRemovingTabs()) {
+            String name = "x " + gt.name;
+            int tw = client.font.width(name);
+            int w = tw + 8;
+            float ga = a * gt.alpha;
+            if(ga > 0.01f) {
+                int windowHeight = client.getWindow().getGuiScaledHeight();
+                int gx = 4;
+                int gy = Mth.floor((windowHeight - baseYOffset) / chatScale) - 17;
+                ChatHudOverlays.fillRoundedRect(guiGraphics, gx, gy, w, 13, 0x44FF4444, ga);
+                guiGraphics.drawString(client.font, name, gx + 3, gy + 2, 0xFFFFFF | (Math.round(255 * ga) << 24));
+            }
+        }
     }
 
     @Redirect(method = "handleChatInput", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendChat(Ljava/lang/String;)V"))
