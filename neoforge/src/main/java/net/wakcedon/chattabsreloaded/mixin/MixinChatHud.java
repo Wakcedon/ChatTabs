@@ -274,6 +274,7 @@ public abstract class MixinChatHud implements IChatHud {
 
     @Override
     public void chatTabs$startDrag(int tabIndex, int mouseX, int mouseY, int tabX) {
+        if(tabIndex < 0) return;
         chattabs$dragging = true;
         chattabs$dragTabIndex = tabIndex;
         chattabs$dragMouseX = mouseX;
@@ -289,8 +290,15 @@ public abstract class MixinChatHud implements IChatHud {
         ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
 
         if(Math.abs(mouseX - chattabs$dragMouseX) < 5) {
+            java.util.List<ChatTab> allTabs = config.getChatTabs();
+            if(chattabs$dragTabIndex < 0 || chattabs$dragTabIndex >= allTabs.size()) {
+                chattabs$dragging = false;
+                chattabs$dragTabIndex = -1;
+                chattabs$dropIndex = -1;
+                return;
+            }
             java.util.List<ChatTab> visibleTabs = config.getVisibleChatTabs();
-            ChatTab tab = config.getChatTabs().get(chattabs$dragTabIndex);
+            ChatTab tab = allTabs.get(chattabs$dragTabIndex);
             int visibleIdx = visibleTabs.indexOf(tab);
             if(visibleIdx >= 0) chattabs$selectTab(visibleIdx);
             chattabs$dragging = false;

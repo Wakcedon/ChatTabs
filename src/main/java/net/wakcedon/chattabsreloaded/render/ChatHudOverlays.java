@@ -90,10 +90,16 @@ public class ChatHudOverlays {
                 fillRoundedRect(context, x - 1, y - 1, width + 2, height + 2, config.selectedTabColor.getRGB(), alpha);
             } else if(tab.hasUnreads()) {
                 int base = config.unreadColor.getRGB();
-                float pulse = (float)((Math.sin(System.currentTimeMillis() / 300.0 * Math.PI * 2) + 1.0) / 2.0);
-                int pa = Math.round(((base >> 24) & 0xFF) * (0.2f + 0.8f * pulse));
-                int pc = (pa << 24) | (base & 0x00FFFFFF);
-                fillRoundedRect(context, x - 1, y - 1, width + 2, height + 2, pc, alpha);
+                if(tab.shouldBlink()) {
+                    float pulse = (float)((Math.sin(System.currentTimeMillis() / 300.0 * Math.PI * 2) + 1.0) / 2.0);
+                    int pa = Math.round(((base >> 24) & 0xFF) * (0.2f + 0.8f * pulse));
+                    int pc = (pa << 24) | (base & 0x00FFFFFF);
+                    fillRoundedRect(context, x - 1, y - 1, width + 2, height + 2, pc, alpha);
+                } else {
+                    int sa = ((base >> 24) & 0xFF) / 3;
+                    int sc = (sa << 24) | (base & 0x00FFFFFF);
+                    fillRoundedRect(context, x - 1, y - 1, width + 2, height + 2, sc, alpha);
+                }
             }
             fillRoundedRect(context, x, y, width, height, hovered ? config.bgColorHovered.getRGB() : config.bgColor.getRGB(), alpha);
             context.drawString(client.font, tabNameStr, x + 3, y + 2, -1, config.textShadow);

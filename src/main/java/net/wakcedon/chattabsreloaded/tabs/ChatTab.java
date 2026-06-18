@@ -28,6 +28,8 @@ public class ChatTab {
     
     private boolean firstMessageUnread = true;
     private int messagesAtLastSeen = 0;
+    private long firstUnreadTime = 0;
+    private static final long BLINK_DURATION_MS = 4000;
     
     public ChatTab(String id, String name, boolean save, boolean visibleByDefault, ChatLineFilter filter, SendModifier sendModifier) {
         this.id = id;
@@ -107,9 +109,13 @@ public class ChatTab {
     }
     
     public void addChatLine(ChatLine line) {
+        boolean hadUnreads = hasUnreads();
         visibleLines.addFirst(line);
         while(visibleLines.size() > net.wakcedon.chattabsreloaded.ChatTabs.getMaxLines()) {
             visibleLines.removeLast();
+        }
+        if(!hadUnreads && hasUnreads()) {
+            firstUnreadTime = System.currentTimeMillis();
         }
     }
     
@@ -120,6 +126,13 @@ public class ChatTab {
             messagesAtLastSeen = visibleLines.size();
             firstMessageUnread = false;
         }
+        firstUnreadTime = 0;
+    }
+
+    public boolean shouldBlink() {
+        if(!hasUnreads()) return false;
+        if(firstUnreadTime == 0) return true;
+        return System.currentTimeMillis() - firstUnreadTime < BLINK_DURATION_MS;
     }
     
     public List<ChatLine> getVisibleChatLines() {
