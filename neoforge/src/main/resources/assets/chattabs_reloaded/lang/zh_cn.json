@@ -4,6 +4,8 @@
   "chattabs_reloaded.configuration.general.tooltip": "通用设置",
   "chattabs_reloaded.configuration.appearance": "外观",
   "chattabs_reloaded.configuration.appearance.tooltip": "外观设置",
+  "chattabs_reloaded.configuration.tab_features": "标签功能",
+  "chattabs_reloaded.configuration.tab_features.tooltip": "标签功能设置",
 
   "chattabsconfig.title": "聊天标签设置",
 

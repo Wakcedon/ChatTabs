@@ -31,9 +31,6 @@ public class EditChatScreen extends Screen {
         super(Component.translatable("chattabs.editchatscreen"));
         this.parent = parent;
         this.config = ChatTabsConfigBase.getInstance();
-        addRenderableWidget(Button.builder(Component.translatable("chattabs.editchatscreen.editfocused"), button -> editFocused = !editFocused)
-                .bounds(4, height - 30, font.width(Component.translatable("chattabs.editchatscreen.editfocused")) + 28, 20)
-                .build());
     }
     
     @Override
@@ -41,6 +38,9 @@ public class EditChatScreen extends Screen {
         int lineHeight = (int)(9 * (minecraft.options.chatLineSpacing().get() + 1));
         config.chatHeightFocused = (config.chatHeightFocused / lineHeight) * lineHeight;
         config.chatHeightUnfocused = (config.chatHeightUnfocused / lineHeight) * lineHeight;
+        addRenderableWidget(Button.builder(Component.translatable("chattabs.editchatscreen.editfocused"), button -> editFocused = !editFocused)
+                .bounds(4, height - 30, font.width(Component.translatable("chattabs.editchatscreen.editfocused")) + 28, 20)
+                .build());
     }
     
     @Override

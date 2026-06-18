@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -161,18 +162,28 @@ public abstract class MixinChatHud implements IChatHud {
         if(chattabs$hoveredTab >= 0) {
             if(button == 1) {
                 chattabs$showTabContextMenu(client, (int)mouseX, (int)mouseY);
-            } else if(config.tabDragAndDrop) {
+            } else if(config.tabDragAndDrop && Screen.hasShiftDown()) {
                 java.util.List<ChatTab> visible = config.getVisibleChatTabs();
                 if(chattabs$hoveredTab < visible.size()) {
                     int actualIdx = config.getChatTabs().indexOf(visible.get(chattabs$hoveredTab));
                     chatTabs$startDrag(actualIdx, (int)mouseX, (int)mouseY, 0);
                 }
             } else {
-                config.selectedTab = chattabs$hoveredTab;
+                chattabs$selectTab(chattabs$hoveredTab);
             }
             return true;
         }
         return false;
+    }
+
+    @Unique
+    private void chattabs$selectTab(int visibleIdx) {
+        ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
+        ChatTab oldTab = config.getSelectedChatTab();
+        if(oldTab != null) oldTab.setFocused(false);
+        config.selectedTab = visibleIdx;
+        ChatTab newTab = config.getSelectedChatTab();
+        if(newTab != null) newTab.setFocused(true);
     }
 
     @Override
@@ -236,7 +247,7 @@ public abstract class MixinChatHud implements IChatHud {
             java.util.List<ChatTab> visibleTabs = config.getVisibleChatTabs();
             ChatTab tab = config.getChatTabs().get(chattabs$dragTabIndex);
             int visibleIdx = visibleTabs.indexOf(tab);
-            if(visibleIdx >= 0) config.selectedTab = visibleIdx;
+            if(visibleIdx >= 0) chattabs$selectTab(visibleIdx);
             chattabs$dragging = false;
             chattabs$dragTabIndex = -1;
             chattabs$dropIndex = -1;
@@ -297,6 +308,7 @@ public abstract class MixinChatHud implements IChatHud {
     @Unique
     private void chattabs$showTabContextMenu(Minecraft client, int mouseX, int mouseY) {
         ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
+        int hoveredTabAtCreation = chattabs$hoveredTab;
         chattabs$contextMenu = new ChatContextMenu(mouseX, mouseY, config,
             new ChatContextMenu.Element(Component.translatable("chattabsconfig.contextmenu.tab.newtab"), () -> {
                 config.addChatTabFirst(new ChatTab());
@@ -304,16 +316,25 @@ public abstract class MixinChatHud implements IChatHud {
             }),
             new ChatContextMenu.Element(),
             new ChatContextMenu.Element(Component.translatable("chattabsconfig.contextmenu.tab.delete"), () -> {
-                if(chattabs$hoveredTab > 0) {
-                    config.getChatTabs().remove(chattabs$hoveredTab);
-                    if(config.selectedTab >= chattabs$hoveredTab) config.selectedTab--;
+                if(hoveredTabAtCreation >= 0) {
+                    List<ChatTab> visibleTabs = config.getVisibleChatTabs();
+                    if(hoveredTabAtCreation < visibleTabs.size()) {
+                        ChatTab tab = visibleTabs.get(hoveredTabAtCreation);
+                        int allIdx = config.getChatTabs().indexOf(tab);
+                        if(allIdx >= 0) {
+                            config.getChatTabs().remove(allIdx);
+                            if(config.selectedTab >= allIdx) config.selectedTab--;
+                        }
+                    }
                     chattabs$contextMenu = null;
                 }
             }),
             new ChatContextMenu.Element(Component.translatable("chattabsconfig.contextmenu.tab.moveleft"), () -> {
+                chattabs$moveTab(hoveredTabAtCreation, -1);
                 chattabs$contextMenu = null;
             }),
             new ChatContextMenu.Element(Component.translatable("chattabsconfig.contextmenu.tab.moveright"), () -> {
+                chattabs$moveTab(hoveredTabAtCreation, 1);
                 chattabs$contextMenu = null;
             }),
             new ChatContextMenu.Element(),
@@ -322,5 +343,31 @@ public abstract class MixinChatHud implements IChatHud {
                 chattabs$contextMenu = null;
             })
         );
+    }
+
+    @Unique
+    private void chattabs$moveTab(int visibleIdx, int direction) {
+        if(visibleIdx < 0) return;
+        ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
+        List<ChatTab> visible = config.getVisibleChatTabs();
+        if(visibleIdx >= visible.size()) return;
+        int newIdx = visibleIdx + direction;
+        if(newIdx < 0 || newIdx >= visible.size()) return;
+
+        List<ChatTab> all = config.getChatTabs();
+        ChatTab tab = visible.get(visibleIdx);
+        ChatTab neighbor = visible.get(newIdx);
+        int tabAllIdx = all.indexOf(tab);
+        int neighAllIdx = all.indexOf(neighbor);
+        if(tabAllIdx < 0 || neighAllIdx < 0) return;
+
+        all.set(tabAllIdx, neighbor);
+        all.set(neighAllIdx, tab);
+
+        if(config.selectedTab == visibleIdx) {
+            config.selectedTab = newIdx;
+        } else if(config.selectedTab == newIdx) {
+            config.selectedTab = visibleIdx;
+        }
     }
 }

@@ -1,6 +1,7 @@
 package net.wakcedon.chattabsreloaded.tabs;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 
 public class NeoForgeChatLine implements ChatLine {
     private final Component content;
@@ -35,6 +36,14 @@ public class NeoForgeChatLine implements ChatLine {
         try {
             Object result = line.getClass().getMethod("content").invoke(line);
             if(result instanceof Component c) return c;
+            if(result instanceof FormattedCharSequence fcs) {
+                StringBuilder sb = new StringBuilder();
+                fcs.accept((index, style, codePoint) -> {
+                    sb.appendCodePoint(codePoint);
+                    return true;
+                });
+                return Component.literal(sb.toString());
+            }
         } catch(Exception ignored) {}
         return null;
     }

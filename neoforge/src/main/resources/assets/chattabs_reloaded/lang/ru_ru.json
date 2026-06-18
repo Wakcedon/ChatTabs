@@ -4,6 +4,8 @@
   "chattabs_reloaded.configuration.general.tooltip": "Общие настройки",
   "chattabs_reloaded.configuration.appearance": "Внешний вид",
   "chattabs_reloaded.configuration.appearance.tooltip": "Настройки внешнего вида",
+  "chattabs_reloaded.configuration.tab_features": "Функции вкладок",
+  "chattabs_reloaded.configuration.tab_features.tooltip": "Настройки функций вкладок",
 
   "chattabsconfig.title": "ChatTabs Reloaded — Настройки",
 

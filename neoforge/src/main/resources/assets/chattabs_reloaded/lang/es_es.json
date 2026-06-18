@@ -4,6 +4,8 @@
   "chattabs_reloaded.configuration.general.tooltip": "Configuración general",
   "chattabs_reloaded.configuration.appearance": "Apariencia",
   "chattabs_reloaded.configuration.appearance.tooltip": "Configuración de apariencia",
+  "chattabs_reloaded.configuration.tab_features": "Características de pestañas",
+  "chattabs_reloaded.configuration.tab_features.tooltip": "Configuración de características de pestañas",
 
   "chattabsconfig.title": "Configuración de Chat Tabs",
 
