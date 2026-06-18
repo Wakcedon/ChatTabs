@@ -12,6 +12,9 @@ public class ChatTabsModConfig {
         public final ModConfigSpec.BooleanValue clearHistory;
         public final ModConfigSpec.BooleanValue textShadow;
         public final ModConfigSpec.BooleanValue autoGenerateMsgTabs;
+        public final ModConfigSpec.BooleanValue showUnreadCounter;
+        public final ModConfigSpec.BooleanValue tabDragAndDrop;
+        public final ModConfigSpec.BooleanValue tabAnimationFade;
         public final ModConfigSpec.ConfigValue<String> selectedTabColor;
         public final ModConfigSpec.ConfigValue<String> unreadColor;
         public final ModConfigSpec.ConfigValue<String> bgColor;
@@ -44,6 +47,25 @@ public class ChatTabsModConfig {
                     .comment("Automatically create tabs for received DMs.")
                     .translation("chattabsconfig.autogeneratemsgtabs")
                     .define("autoGenerateMsgTabs", true);
+
+            showUnreadCounter = builder
+                    .comment("Show unread message count badge on tabs.")
+                    .translation("chattabsconfig.showunreadcounter")
+                    .define("showUnreadCounter", true);
+
+            builder.pop();
+
+            builder.comment("Tab features").push("tab_features");
+
+            tabDragAndDrop = builder
+                    .comment("Enable drag & drop tab reordering.")
+                    .translation("chattabsconfig.tabdraganddrop")
+                    .define("tabDragAndDrop", true);
+
+            tabAnimationFade = builder
+                    .comment("Enable smooth fade animation on tab bar when opening/closing chat.")
+                    .translation("chattabsconfig.tabanimationfade")
+                    .define("tabAnimationFade", true);
 
             builder.pop();
 

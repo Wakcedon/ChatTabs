@@ -93,6 +93,10 @@ public class ChatTab {
     public ChatLineFilter getFilter() {
         return filter;
     }
+
+    public void setFilter(ChatLineFilter filter) {
+        this.filter = filter;
+    }
     
     public SendModifier getSendModifier() {
         return sendModifier;
@@ -142,5 +146,11 @@ public class ChatTab {
         if(visibleLines.isEmpty()) return false;
         if(firstMessageUnread) return true;
         return visibleLines.size() > messagesAtLastSeen;
+    }
+
+    public int getUnreadCount() {
+        if(visibleLines.isEmpty()) return 0;
+        if(firstMessageUnread) return visibleLines.size();
+        return Math.max(0, visibleLines.size() - messagesAtLastSeen);
     }
 }

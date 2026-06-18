@@ -14,4 +14,13 @@ public interface IChatHud {
     void chatTabs$renderDummy(GuiGraphics context, Font textRenderer, int ticks, int mouseX, int mouseY, boolean checked);
     
     void chatTabs$setHoverState(int hoveredTab, int tabScroll);
+
+    boolean chatTabs$isDragging();
+    int chatTabs$getDragTabIndex();
+    int chatTabs$getDropIndex();
+    void chatTabs$startDrag(int tabIndex, int mouseX, int mouseY, int tabX);
+    void chatTabs$endDrag(int mouseX);
+
+    float chatTabs$getAnimAlpha();
+    void chatTabs$setAnimTarget(boolean visible);
 }

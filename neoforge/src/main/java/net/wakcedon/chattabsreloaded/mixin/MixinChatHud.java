@@ -12,7 +12,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MessageSignature;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -34,9 +36,26 @@ public abstract class MixinChatHud implements IChatHud {
     @Unique
     private int chattabs$hoveredTab = -1;
     @Unique
+    private boolean chattabs$dragging;
+    @Unique
+    private int chattabs$dragTabIndex = -1;
+    @Unique
+    private int chattabs$dropIndex = -1;
+    @Unique
+    private int chattabs$dragMouseX;
+    @Unique
+    private int chattabs$dragMouseY;
+    @Unique
+    private int chattabs$dragTabX; // tab's x position when drag started
+    @Unique
     private ChatContextMenu chattabs$contextMenu;
     @Unique
     private List<?> chattabs$savedTrimmedMessages;
+
+    @Unique
+    private float chattabs$animAlpha = 0.0f;
+    @Unique
+    private float chattabs$animTarget = 0.0f;
 
     @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIIZ)V", at = @At("TAIL"))
     private void chattabs$onRender(GuiGraphics guiGraphics, int tickCount, int mouseX, int mouseY, boolean focused, CallbackInfo ci) {
@@ -45,6 +64,34 @@ public abstract class MixinChatHud implements IChatHud {
 
     @Unique
     private void chattabs$renderTabs(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        Minecraft client = Minecraft.getInstance();
+        ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
+        if(!config.enabled) return;
+
+        if(config.tabAnimationFade) {
+            boolean chatOpen = client.screen instanceof net.minecraft.client.gui.screens.ChatScreen;
+            float target = chatOpen ? 1.0f : 0.0f;
+            chattabs$animTarget = target;
+            if(chattabs$animAlpha < target) {
+                chattabs$animAlpha = Math.min(chattabs$animAlpha + 0.12f, target);
+            } else if(chattabs$animAlpha > target) {
+                chattabs$animAlpha = Math.max(chattabs$animAlpha - 0.12f, target);
+            }
+        } else {
+            chattabs$animAlpha = 1.0f;
+        }
+
+        if(client.screen instanceof net.minecraft.client.gui.screens.ChatScreen) return;
+
+        if(chattabs$animAlpha <= 0.001f) return;
+
+        int windowHeight = client.getWindow().getGuiScaledHeight();
+        float chatScale = client.options.chatScale().get().floatValue();
+
+        ChatHudOverlays.renderChatTabs(
+            client, chattabs$tabScroll, guiGraphics, windowHeight, chatScale,
+            false, config.chatWidth, mouseX, mouseY, 0, false, 0, null, chattabs$animAlpha
+        );
     }
 
     @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIIZ)V", at = @At("HEAD"))
@@ -72,8 +119,23 @@ public abstract class MixinChatHud implements IChatHud {
         }
     }
 
-    @Inject(method = "addMessage(Lnet/minecraft/network/chat/Component;)V", at = @At("HEAD"))
-    private void chattabs$onAddMessage(Component message, CallbackInfo ci) {
+    @Inject(method = "addClientSystemMessage(Lnet/minecraft/network/chat/Component;)V", at = @At("HEAD"))
+    private void chattabs$onClientSystemMessage(Component message, CallbackInfo ci) {
+        chattabs$processMessage(message);
+    }
+
+    @Inject(method = "addServerSystemMessage(Lnet/minecraft/network/chat/Component;)V", at = @At("HEAD"))
+    private void chattabs$onServerSystemMessage(Component message, CallbackInfo ci) {
+        chattabs$processMessage(message);
+    }
+
+    @Inject(method = "addPlayerMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V", at = @At("HEAD"))
+    private void chattabs$onPlayerMessage(Component message, MessageSignature signature, GuiMessageTag tag, CallbackInfo ci) {
+        chattabs$processMessage(message);
+    }
+
+    @Unique
+    private void chattabs$processMessage(Component message) {
         ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
         if(!config.enabled) return;
 
@@ -111,6 +173,12 @@ public abstract class MixinChatHud implements IChatHud {
         if(chattabs$hoveredTab >= 0) {
             if(button == 1) {
                 chattabs$showTabContextMenu(client, (int)mouseX, (int)mouseY);
+            } else if(config.tabDragAndDrop) {
+                java.util.List<ChatTab> visible = config.getVisibleChatTabs();
+                if(chattabs$hoveredTab < visible.size()) {
+                    int actualIdx = config.getChatTabs().indexOf(visible.get(chattabs$hoveredTab));
+                    chattabs$startDrag(actualIdx, (int)mouseX, (int)mouseY, 0);
+                }
             } else {
                 config.selectedTab = chattabs$hoveredTab;
             }
@@ -130,9 +198,90 @@ public abstract class MixinChatHud implements IChatHud {
     }
 
     @Override
+    public float chatTabs$getAnimAlpha() {
+        return chattabs$animAlpha;
+    }
+
+    @Override
+    public void chatTabs$setAnimTarget(boolean visible) {
+        chattabs$animTarget = visible ? 1.0f : 0.0f;
+    }
+
+    @Override
     public void chatTabs$setHoverState(int hoveredTab, int tabScroll) {
         chattabs$hoveredTab = hoveredTab;
         chattabs$tabScroll = tabScroll;
+    }
+
+    @Override
+    public boolean chatTabs$isDragging() {
+        return chattabs$dragging;
+    }
+
+    @Override
+    public int chatTabs$getDragTabIndex() {
+        return chattabs$dragTabIndex;
+    }
+
+    @Override
+    public int chatTabs$getDropIndex() {
+        return chattabs$dropIndex;
+    }
+
+    @Override
+    public void chatTabs$startDrag(int tabIndex, int mouseX, int mouseY, int tabX) {
+        chattabs$dragging = true;
+        chattabs$dragTabIndex = tabIndex;
+        chattabs$dragMouseX = mouseX;
+        chattabs$dragMouseY = mouseY;
+        chattabs$dragTabX = tabX;
+        chattabs$dropIndex = tabIndex;
+    }
+
+    @Override
+    public void chatTabs$endDrag(int mouseX) {
+        if(!chattabs$dragging) return;
+
+        ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
+
+        if(Math.abs(mouseX - chattabs$dragMouseX) < 5) {
+            java.util.List<ChatTab> visibleTabs = config.getVisibleChatTabs();
+            ChatTab tab = config.getChatTabs().get(chattabs$dragTabIndex);
+            int visibleIdx = visibleTabs.indexOf(tab);
+            if(visibleIdx >= 0) config.selectedTab = visibleIdx;
+            chattabs$dragging = false;
+            chattabs$dragTabIndex = -1;
+            chattabs$dropIndex = -1;
+            return;
+        }
+
+        java.util.List<ChatTab> allTabs = config.getChatTabs();
+        java.util.List<ChatTab> visibleTabs = config.getVisibleChatTabs();
+        int from = chattabs$dragTabIndex;
+        int toVisible = chattabs$dropIndex;
+
+        if(from >= 0 && from < allTabs.size() && toVisible >= 0) {
+            int to = toVisible < visibleTabs.size() ? allTabs.indexOf(visibleTabs.get(toVisible)) : allTabs.size();
+            if(to < 0) to = allTabs.size();
+
+            if(from != to) {
+                ChatTab tab = allTabs.remove(from);
+                int insertAt = to > from ? to - 1 : to;
+                allTabs.add(insertAt, tab);
+
+                if(config.selectedTab == from) {
+                    config.selectedTab = insertAt;
+                } else if(from < config.selectedTab && insertAt >= config.selectedTab) {
+                    config.selectedTab--;
+                } else if(from > config.selectedTab && insertAt <= config.selectedTab) {
+                    config.selectedTab++;
+                }
+            }
+        }
+
+        chattabs$dragging = false;
+        chattabs$dragTabIndex = -1;
+        chattabs$dropIndex = -1;
     }
 
     @Override

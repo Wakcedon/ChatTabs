@@ -5,8 +5,10 @@ import net.wakcedon.chattabsreloaded.mixininterface.IChatHud;
 import net.wakcedon.chattabsreloaded.render.ChatHudOverlays;
 import net.wakcedon.chattabsreloaded.render.screen.EditChatScreen;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
+import net.wakcedon.chattabsreloaded.commands.ChatTabsCommands;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.Mth;
 import net.minecraft.client.gui.components.CommandSuggestions;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -20,6 +22,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Mixin(ChatScreen.class)
 public abstract class MixinChatScreen extends Screen {
@@ -53,22 +58,63 @@ public abstract class MixinChatScreen extends Screen {
         ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
         if(!config.enabled) return;
 
+        IChatHud chatHud = (IChatHud)client.gui.getChat();
+        float alpha = config.tabAnimationFade ? chatHud.chatTabs$getAnimAlpha() : 1.0f;
+
         int windowHeight = client.getWindow().getGuiScaledHeight();
         float chatScale = client.options.chatScale().get().floatValue();
         int baseYOffset = height - input.getY();
 
+        List<Integer> tabMidpoints = new ArrayList<>();
         int[] result = ChatHudOverlays.renderChatTabs(
             client, chattabs$tabScroll, guiGraphics, windowHeight, chatScale,
-            true, config.chatWidth, mouseX, mouseY, 0, false, baseYOffset
+            true, config.chatWidth, mouseX, mouseY, 0, false, baseYOffset, tabMidpoints, alpha
         );
         chattabs$hoveredTab = result[0];
         chattabs$tabScroll = result[1];
+        if(config.tabDragAndDrop && chatHud.chatTabs$isDragging()) {
+            if(!client.mouseHandler.isLeftPressed()) {
+                chatHud.chatTabs$endDrag(mouseX);
+                if(config.showUnreadCounter) {
+                    // re-read config after potential reorder (selectedTab may have changed)
+                }
+                chatHud.chatTabs$setHoverState(chattabs$hoveredTab, chattabs$tabScroll);
+                return;
+            }
 
-        ((IChatHud)client.gui.getChat()).chatTabs$setHoverState(chattabs$hoveredTab, chattabs$tabScroll);
+            int dropIdx = tabMidpoints.size();
+            for(int i = 0; i < tabMidpoints.size(); i++) {
+                if(mouseX < tabMidpoints.get(i)) {
+                    dropIdx = i;
+                    break;
+                }
+            }
+
+            int tabY = Mth.floor((windowHeight - baseYOffset) / chatScale) - 17;
+
+            int indicatorX = dropIdx < tabMidpoints.size()
+                ? tabMidpoints.get(dropIdx)
+                : (tabMidpoints.isEmpty() ? 4 : tabMidpoints.get(tabMidpoints.size() - 1) + 20);
+
+            ChatHudOverlays.renderDropIndicator(guiGraphics, indicatorX - 1, tabY, 13);
+
+            List<ChatTab> allTabs = config.getChatTabs();
+            int dragIdx = chatHud.chatTabs$getDragTabIndex();
+            if(dragIdx >= 0 && dragIdx < allTabs.size()) {
+                ChatHudOverlays.renderFloatingTab(guiGraphics, client, allTabs.get(dragIdx).getDisplayComponent().getString(), mouseX, mouseY);
+            }
+
+            chatHud.chatTabs$setHoverState(chattabs$hoveredTab, chattabs$tabScroll);
+            return;
+        }
+
+        chatHud.chatTabs$setHoverState(chattabs$hoveredTab, chattabs$tabScroll);
     }
 
     @Redirect(method = "handleChatInput", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendChat(Ljava/lang/String;)V"))
     private void modifyChatMessage(ClientPacketListener instance, String content) {
+        if(ChatTabsCommands.handleCommand(content)) return;
+
         ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
         if(config.enabled) {
             ChatTab selectedTab = config.getSelectedChatTab();

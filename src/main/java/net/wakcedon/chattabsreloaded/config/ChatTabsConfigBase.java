@@ -62,6 +62,15 @@ public class ChatTabsConfigBase {
     public boolean autoGenerateMsgTabs = true;
 
     @Expose
+    public boolean showUnreadCounter = true;
+
+    @Expose
+    public boolean tabDragAndDrop = true;
+
+    @Expose
+    public boolean tabAnimationFade = true;
+
+    @Expose
     private boolean saveGenerated = false;
 
     public int selectedTab = 0;

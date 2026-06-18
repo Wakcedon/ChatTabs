@@ -136,6 +136,9 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         this.clearHistory = ChatTabsModConfig.CLIENT.clearHistory.get();
         this.textShadow = ChatTabsModConfig.CLIENT.textShadow.get();
         this.autoGenerateMsgTabs = ChatTabsModConfig.CLIENT.autoGenerateMsgTabs.get();
+        this.showUnreadCounter = ChatTabsModConfig.CLIENT.showUnreadCounter.get();
+        this.tabDragAndDrop = ChatTabsModConfig.CLIENT.tabDragAndDrop.get();
+        this.tabAnimationFade = ChatTabsModConfig.CLIENT.tabAnimationFade.get();
         this.selectedTabColor = parseHexColor(ChatTabsModConfig.CLIENT.selectedTabColor.get());
         this.unreadColor = parseHexColor(ChatTabsModConfig.CLIENT.unreadColor.get());
         this.bgColor = parseHexColor(ChatTabsModConfig.CLIENT.bgColor.get());
@@ -206,6 +209,9 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         this.chatHeightUnfocused = other.chatHeightUnfocused;
         this.chatHeightFocused = other.chatHeightFocused;
         this.autoGenerateMsgTabs = other.autoGenerateMsgTabs;
+        this.showUnreadCounter = other.showUnreadCounter;
+        this.tabDragAndDrop = other.tabDragAndDrop;
+        this.tabAnimationFade = other.tabAnimationFade;
         this.selectedTab = other.selectedTab;
         this.getChatTabs().clear();
         this.getChatTabs().addAll(other.getChatTabs());
