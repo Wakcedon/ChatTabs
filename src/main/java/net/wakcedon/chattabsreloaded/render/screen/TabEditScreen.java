@@ -32,7 +32,7 @@ public class TabEditScreen extends Screen {
     @Override
     protected void init() {
         int cx = width / 2;
-        fw = Math.min(260, width - 40);
+        fw = Math.min(320, width - 40);
         left = cx - fw / 2;
         halfW = (fw - 8) / 2;
         rowH = 18;
@@ -146,7 +146,7 @@ public class TabEditScreen extends Screen {
 
     private Component makeToggleLabel(String key, boolean value) {
         return Component.translatable(key).append(": ").append(
-                Component.literal(value ? "§aON" : "§cOFF"));
+                value ? Component.translatable("chattabs.value.on") : Component.translatable("chattabs.value.off"));
     }
 
     @Override

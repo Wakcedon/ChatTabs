@@ -75,9 +75,6 @@ public abstract class MixinChatScreen extends Screen {
         if(config.tabDragAndDrop && chatHud.chatTabs$isDragging()) {
             if(!client.mouseHandler.isLeftPressed()) {
                 chatHud.chatTabs$endDrag(mouseX);
-                if(config.showUnreadCounter) {
-                    // re-read config after potential reorder (selectedTab may have changed)
-                }
                 chatHud.chatTabs$setHoverState(chattabs$hoveredTab, chattabs$tabScroll);
                 return;
             }
@@ -112,15 +109,15 @@ public abstract class MixinChatScreen extends Screen {
 
         float a = config.tabAnimationFade ? chatHud.chatTabs$getAnimAlpha() : 1.0f;
         for(net.wakcedon.chattabsreloaded.render.GhostTab gt : chatHud.chatTabs$getRemovingTabs()) {
-            String name = "x " + gt.name;
-            int tw = client.font.width(name);
+            String ghostStr = Component.translatable("chattabs.ghost.deleted", gt.name).getString();
+            int tw = client.font.width(ghostStr);
             int w = tw + 8;
             float ga = a * gt.alpha;
             if(ga > 0.01f) {
                 int gx = 4;
                 int gy = Mth.floor((windowHeight - baseYOffset) / chatScale) - 19;
                 ChatHudOverlays.fillRoundedRect(guiGraphics, gx, gy, w, 13, 0x44FF4444, ga);
-                guiGraphics.drawString(client.font, name, gx + 3, gy + 2, 0xFFFFFF | (Math.round(255 * ga) << 24));
+                guiGraphics.drawString(client.font, ghostStr, gx + 3, gy + 2, 0xFFFFFF | (Math.round(255 * ga) << 24));
             }
         }
     }
@@ -154,6 +151,22 @@ public abstract class MixinChatScreen extends Screen {
     public void mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         if(((IChatHud)this.minecraft.gui.getChat()).chatTabs$mouseClicked(mouseX, mouseY, button)) {
             cir.setReturnValue(true);
+        }
+    }
+
+    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
+    private void chattabs$onKeyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+        if(Screen.hasControlDown() && keyCode >= 49 && keyCode <= 57) {
+            int tabIndex = keyCode - 49;
+            ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
+            if(config.enabled && tabIndex >= 0 && tabIndex < config.getVisibleChatTabs().size()) {
+                ChatTab oldTab = config.getSelectedChatTab();
+                if(oldTab != null) oldTab.setFocused(false);
+                config.selectedTab = tabIndex;
+                ChatTab newTab = config.getSelectedChatTab();
+                if(newTab != null) newTab.setFocused(true);
+                cir.setReturnValue(true);
+            }
         }
     }
 

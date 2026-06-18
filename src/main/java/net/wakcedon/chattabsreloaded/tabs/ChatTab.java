@@ -32,6 +32,8 @@ public class ChatTab {
     private long blinkDuration = 3000;
     private static final long FIRST_BLINK_MS = 3000;
     private static final long SUBSEQUENT_BLINK_MS = 1500;
+
+    private long badgeAppearStart = 0;
     
     public ChatTab(String id, String name, boolean save, boolean visibleByDefault, ChatLineFilter filter, SendModifier sendModifier) {
         this.id = id;
@@ -55,7 +57,7 @@ public class ChatTab {
     }
     
     public ChatTab() {
-        this("New Tab", true);
+        this("chattabs.tab.new", true);
     }
     
     public void setId(String id) {
@@ -83,7 +85,10 @@ public class ChatTab {
     }
 
     public Component getDisplayComponent() {
-        return Component.translatable(this.name);
+        if (this.name != null && this.name.startsWith("chattabs.")) {
+            return Component.translatable(this.name);
+        }
+        return Component.literal(this.name != null ? this.name : "");
     }
     
     public boolean shouldSave() {
@@ -119,6 +124,9 @@ public class ChatTab {
         if(hasUnreads()) {
             lastUnreadTime = System.currentTimeMillis();
             blinkDuration = hadUnreads ? SUBSEQUENT_BLINK_MS : FIRST_BLINK_MS;
+            if(!hadUnreads) {
+                badgeAppearStart = System.currentTimeMillis();
+            }
         }
     }
     
@@ -130,6 +138,16 @@ public class ChatTab {
             firstMessageUnread = false;
         }
         lastUnreadTime = 0;
+        badgeAppearStart = 0;
+    }
+
+    public float getBadgeAlpha() {
+        if(!hasUnreads()) return 0;
+        if(badgeAppearStart == 0) return 1.0f;
+        long elapsed = System.currentTimeMillis() - badgeAppearStart;
+        float alpha = Math.min(elapsed / 200.0f, 1.0f);
+        if(alpha >= 1.0f) badgeAppearStart = 0;
+        return alpha;
     }
 
     public boolean shouldBlink() {

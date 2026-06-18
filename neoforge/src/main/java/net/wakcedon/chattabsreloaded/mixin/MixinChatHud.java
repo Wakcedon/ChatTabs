@@ -1,10 +1,14 @@
 package net.wakcedon.chattabsreloaded.mixin;
 
 import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
+import net.wakcedon.chattabsreloaded.config.NeoForgeChatTabsConfig;
+import net.wakcedon.chattabsreloaded.config.ProfilesConfig;
 import net.wakcedon.chattabsreloaded.mixininterface.IChatHud;
+import net.wakcedon.chattabsreloaded.profiles.ServerTabProfile;
 import net.wakcedon.chattabsreloaded.render.ChatContextMenu;
 import net.wakcedon.chattabsreloaded.render.ChatHudOverlays;
 import net.wakcedon.chattabsreloaded.render.GhostTab;
+import net.wakcedon.chattabsreloaded.render.screen.ProfileListScreen;
 import net.wakcedon.chattabsreloaded.render.screen.TabEditScreen;
 import net.wakcedon.chattabsreloaded.tabs.ChatLine;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
@@ -121,13 +125,13 @@ public abstract class MixinChatHud implements IChatHud {
         int y = net.minecraft.util.Mth.floor(windowHeight / chatScale) - 19;
         int height = 13;
         for(GhostTab gt : chattabs$removingTabs) {
-            String name = "x " + gt.name;
-            int tw = client.font.width(name);
+            String ghostStr = Component.translatable("chattabs.ghost.deleted", gt.name).getString();
+            int tw = client.font.width(ghostStr);
             int w = tw + 8;
             float a = alpha * gt.alpha;
             if(a > 0.01f) {
                 ChatHudOverlays.fillRoundedRect(ctx, x, y, w, height, 0x44FF4444, a);
-                ctx.drawString(client.font, name, x + 3, y + 2, 0xFFFFFF | (Math.round(255 * a) << 24));
+                ctx.drawString(client.font, ghostStr, x + 3, y + 2, 0xFFFFFF | (Math.round(255 * a) << 24));
             }
             x += w + 4;
         }
@@ -359,7 +363,7 @@ public abstract class MixinChatHud implements IChatHud {
         context.fill(0, -visualHeight, chatWidth, 0, config.bgColor.getRGB());
         for(int i = 0; i < 5; i++) {
             int y = -12 - (i * 12);
-            context.drawString(textRenderer, "Chat line " + (i + 1), 4, y, 0xAAAAAA, config.textShadow);
+            context.drawString(textRenderer, Component.translatable("chattabs.dummy.line", i + 1), 4, y, 0xAAAAAA, config.textShadow);
         }
     }
 
@@ -389,7 +393,7 @@ public abstract class MixinChatHud implements IChatHud {
                         ChatTab tab = visibleTabs.get(hoveredTabAtCreation);
                         int allIdx = config.getChatTabs().indexOf(tab);
                         if(allIdx >= 0) {
-                            chatTabs$showRemoveAnim(tab.getId(), tab.getName());
+                            chatTabs$showRemoveAnim(tab.getId(), tab.getDisplayComponent().getString());
                             config.getChatTabs().remove(allIdx);
                             if(config.selectedTab >= allIdx) config.selectedTab--;
                         }
@@ -404,6 +408,11 @@ public abstract class MixinChatHud implements IChatHud {
             new ChatContextMenu.Element(Component.translatable("chattabsconfig.contextmenu.tab.moveright"), () -> {
                 chattabs$moveTab(hoveredTabAtCreation, 1);
                 chattabs$contextMenu = null;
+            }),
+            new ChatContextMenu.Element(),
+            new ChatContextMenu.Element(Component.translatable("chattabsconfig.serverprofiles"), () -> {
+                Minecraft.getInstance().setScreen(new ProfileListScreen(null));
+                chattabs$contextMenu = null;
             })
         );
     }
@@ -417,9 +426,30 @@ public abstract class MixinChatHud implements IChatHud {
         int newIdx = visibleIdx + direction;
         if(newIdx < 0 || newIdx >= visible.size()) return;
 
-        List<ChatTab> all = config.getChatTabs();
         ChatTab tab = visible.get(visibleIdx);
         ChatTab neighbor = visible.get(newIdx);
+
+        if(config instanceof NeoForgeChatTabsConfig ncfg) {
+            String serverIp = Minecraft.getInstance().getCurrentServer() != null
+                ? Minecraft.getInstance().getCurrentServer().ip : null;
+            if(serverIp != null) {
+                ProfilesConfig pc = ncfg.getProfilesConfig();
+                ServerTabProfile profile = pc.findProfile(serverIp);
+                if(profile != null && profile.getTabs() != null && !profile.getTabs().isEmpty()) {
+                    List<ChatTab> profileTabs = profile.getTabs();
+                    int tabIdx = profileTabs.indexOf(tab);
+                    int neighIdx = profileTabs.indexOf(neighbor);
+                    if(tabIdx >= 0 && neighIdx >= 0) {
+                        profileTabs.set(tabIdx, neighbor);
+                        profileTabs.set(neighIdx, tab);
+                        pc.save(ncfg.getProfilesPath());
+                    }
+                    return;
+                }
+            }
+        }
+
+        List<ChatTab> all = config.getChatTabs();
         int tabAllIdx = all.indexOf(tab);
         int neighAllIdx = all.indexOf(neighbor);
         if(tabAllIdx < 0 || neighAllIdx < 0) return;
@@ -432,5 +462,6 @@ public abstract class MixinChatHud implements IChatHud {
         } else if(config.selectedTab == newIdx) {
             config.selectedTab = visibleIdx;
         }
+        config.save();
     }
 }

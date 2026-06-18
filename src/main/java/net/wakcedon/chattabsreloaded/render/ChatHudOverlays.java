@@ -105,10 +105,13 @@ public class ChatHudOverlays {
             int textColor = applyAlpha(0xFFFFFFFF, alpha);
             context.drawString(client.font, tabNameStr, x + 3, y + 2, textColor, config.textShadow);
             if(badgeText != null) {
-                int badgeX = x + 3 + textWidth + 4;
-                int badgeY = y + (height - 10) / 2;
-                fillRoundedRect(context, badgeX, badgeY, badgeW, 10, applyAlpha(0xFFFF4444, alpha), alpha);
-                context.drawString(client.font, badgeText, badgeX + (badgeW - client.font.width(badgeText)) / 2, badgeY + 1, textColor, config.textShadow);
+                float badgeAlpha = alpha * tab.getBadgeAlpha();
+                if(badgeAlpha > 0.01f) {
+                    int badgeX = x + 3 + textWidth + 4;
+                    int badgeY = y + (height - 10) / 2;
+                    fillRoundedRect(context, badgeX, badgeY, badgeW, 10, applyAlpha(0xFFFF4444, badgeAlpha), badgeAlpha);
+                    context.drawString(client.font, badgeText, badgeX + (badgeW - client.font.width(badgeText)) / 2, badgeY + 1, applyAlpha(0xFFFFFFFF, badgeAlpha), config.textShadow);
+                }
             }
             if(tabMidpointsOut != null) {
                 tabMidpointsOut.add(x + width / 2);

@@ -129,4 +129,8 @@ public class ChatTabsConfigBase {
 
     public void reloadProfiles() {
     }
+
+    public ProfilesConfig getProfilesConfig() {
+        return null;
+    }
 }
