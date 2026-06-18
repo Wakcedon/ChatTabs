@@ -3,7 +3,6 @@ package net.wakcedon.chattabsreloaded.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
-import net.wakcedon.chattabsreloaded.profiles.ServerProfile;
 import net.wakcedon.chattabsreloaded.tabs.ChatLineFilter;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
 
@@ -71,15 +70,15 @@ public class ChatTabsConfigBase {
     public boolean tabAnimationFade = true;
 
     @Expose
+    public boolean tabAppearAnimation = true;
+
+    @Expose
     private boolean saveGenerated = false;
 
     public int selectedTab = 0;
 
     @Expose
     private List<ChatTab> chatTabs = new ArrayList<>();
-
-    @Expose
-    public List<ServerProfile> serverProfiles = new ArrayList<>();
 
     private static PlatformConfig platformConfig;
 
@@ -126,5 +125,8 @@ public class ChatTabsConfigBase {
     }
 
     public void load() {
+    }
+
+    public void reloadProfiles() {
     }
 }

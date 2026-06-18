@@ -15,6 +15,7 @@ public class ChatTabsModConfig {
         public final ModConfigSpec.BooleanValue showUnreadCounter;
         public final ModConfigSpec.BooleanValue tabDragAndDrop;
         public final ModConfigSpec.BooleanValue tabAnimationFade;
+        public final ModConfigSpec.BooleanValue tabAppearAnimation;
         public final ModConfigSpec.ConfigValue<String> selectedTabColor;
         public final ModConfigSpec.ConfigValue<String> unreadColor;
         public final ModConfigSpec.ConfigValue<String> bgColor;
@@ -63,9 +64,14 @@ public class ChatTabsModConfig {
                     .define("tabDragAndDrop", true);
 
             tabAnimationFade = builder
-                    .comment("Enable smooth fade animation on tab bar when opening/closing chat.")
+                    .comment("Legacy fade animation on tab bar when closing chat.")
                     .translation("chattabsconfig.tabanimationfade")
                     .define("tabAnimationFade", true);
+
+            tabAppearAnimation = builder
+                    .comment("Smooth appear animation when opening chat.")
+                    .translation("chattabsconfig.tabappearanimation")
+                    .define("tabAppearAnimation", true);
 
             builder.pop();
 

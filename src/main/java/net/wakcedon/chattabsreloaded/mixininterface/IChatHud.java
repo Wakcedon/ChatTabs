@@ -22,9 +22,6 @@ public interface IChatHud {
     void chatTabs$endDrag(int mouseX);
 
     float chatTabs$getAnimAlpha();
-    void chatTabs$setAnimTarget(boolean visible);
-
-    float chatTabs$getChatSlideAnim();
     void chatTabs$showRemoveAnim(String tabId, String tabName);
     java.util.List<net.wakcedon.chattabsreloaded.render.GhostTab> chatTabs$getRemovingTabs();
 }

@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import net.wakcedon.chattabsreloaded.ChatTabs;
-import net.wakcedon.chattabsreloaded.profiles.ServerProfile;
+import net.wakcedon.chattabsreloaded.profiles.ServerTabProfile;
 import net.wakcedon.chattabsreloaded.tabs.ChatLineFilter;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
 import net.wakcedon.chattabsreloaded.tabs.SendModifier;
@@ -17,7 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements PlatformConfig {
@@ -32,9 +31,13 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
             .create();
 
     private final Path configPath;
+    private final Path profilesPath;
+
+    private ProfilesConfig profilesConfig;
 
     public NeoForgeChatTabsConfig(Path configPath) {
         this.configPath = configPath;
+        this.profilesPath = configPath.getParent().resolve("chattabs-profiles.json");
         ChatTabsConfigBase.setPlatformConfig(this);
     }
 
@@ -63,19 +66,30 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         }
     }
 
+    public void loadProfiles() {
+        profilesConfig = ProfilesConfig.load(profilesPath);
+    }
+
+    @Override
+    public void reloadProfiles() {
+        loadProfiles();
+        ChatTabs.LOGGER.info("Reloaded profiles config");
+    }
+
+    public ProfilesConfig getProfilesConfig() {
+        if(profilesConfig == null) loadProfiles();
+        return profilesConfig;
+    }
+
     private static final String[] GLOBAL_TAGS = {
-        // English
         "Global", "G", "Server", "Broadcast", "Announcement",
         "Staff", "Admin", "Mod", "Event", "Shout", "World",
         "Trade", "Auction", "Tip", "Notice",
-        // Russian
         "Глобальный", "Глобал", "Г", "Сервер", "Объявление",
         "Админ", "Модератор", "Мод", "Ивент", "Мир",
         "Торговля", "Аукцион", "Важно",
-        // Spanish
         "Global", "Servidor", "Anuncio", "Staff", "Admin",
         "Evento", "Mundo", "Subasta", "Consejo", "Aviso",
-        // Chinese
         "全球", "服务器", "公告", "工作人员", "管理员",
         "活动", "世界", "交易", "拍卖", "提示",
         "信息", "系统", "通知"
@@ -86,14 +100,7 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
     };
 
     private static final String[] LOCAL_TAGS = {
-        // English
-        "Local", "L",
-        // Russian
-        "Локальный", "Локал", "Л",
-        // Spanish
-        "Local",
-        // Chinese
-        "本地"
+        "Local", "L", "Локальный", "Локал", "Л", "Local", "本地"
     };
 
     private static final String[] LOCAL_CIRCLED = {
@@ -101,16 +108,12 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
     };
 
     private static final String[] NOTIFICATION_TAGS = {
-        // English
         "!", "Server", "Info", "INF", "Notice", "Alert",
         "System", "Notification", "PSA", "Warning",
-        // Russian
         "!", "Сервер", "ИНФО", "Информация", "Система",
         "Уведомление", "Важно", "Объявление", "Предупреждение",
-        // Spanish
         "!", "Servidor", "Info", "Aviso", "Sistema",
         "Notificación", "Importante", "Anuncio", "Advertencia",
-        // Chinese
         "!", "服务器", "信息", "通知", "系统",
         "公告", "重要", "警告"
     };
@@ -122,11 +125,9 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
     }
 
     private static String buildLocalRegex() {
-        String globalTags = String.join("|", GLOBAL_TAGS);
-        String globalCircled = String.join("|", GLOBAL_CIRCLED);
         String localTags = String.join("|", LOCAL_TAGS);
         String localCircled = String.join("|", LOCAL_CIRCLED);
-        return "^(?![!?])(?!.*(?:" + globalCircled + "))(?!.*\\[(?:" + globalTags + ")\\])(?:.*(?:" + localCircled + ").*|.*\\[(?:" + localTags + ")\\].*|.*: .*|.*<[^>]+>.*)";
+        return ".*(?:" + localCircled + ").*|.*\\[(?:" + localTags + ")\\].*|.*: .*|.*<[^>]+>.*";
     }
 
     private static String buildNotificationRegex() {
@@ -157,7 +158,8 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         try {
             Files.createDirectories(configPath.getParent());
             String json = GSON.toJson(this);
-            Files.writeString(configPath, json, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+            Files.writeString(configPath, json, StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
         } catch(IOException e) {
             ChatTabs.LOGGER.warning("Failed to save config: " + e.getMessage());
         }
@@ -173,6 +175,7 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         this.showUnreadCounter = ChatTabsModConfig.CLIENT.showUnreadCounter.get();
         this.tabDragAndDrop = ChatTabsModConfig.CLIENT.tabDragAndDrop.get();
         this.tabAnimationFade = ChatTabsModConfig.CLIENT.tabAnimationFade.get();
+        this.tabAppearAnimation = ChatTabsModConfig.CLIENT.tabAppearAnimation.get();
         this.selectedTabColor = parseHexColor(ChatTabsModConfig.CLIENT.selectedTabColor.get());
         this.unreadColor = parseHexColor(ChatTabsModConfig.CLIENT.unreadColor.get());
         this.bgColor = parseHexColor(ChatTabsModConfig.CLIENT.bgColor.get());
@@ -200,10 +203,13 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
     @Override
     public List<ChatTab> getVisibleChatTabs() {
         String serverIp = getCurrentServerIp();
-        if(serverIp == null) return super.getVisibleChatTabs();
-        ServerProfile bestProfile = findBestProfile(serverIp);
-        if(bestProfile == null) return super.getVisibleChatTabs();
-        return bestProfile.getTabs();
+        if(serverIp != null) {
+            ServerTabProfile profile = getProfilesConfig().findProfile(serverIp);
+            if(profile != null && profile.getTabs() != null && !profile.getTabs().isEmpty()) {
+                return profile.getTabs();
+            }
+        }
+        return super.getVisibleChatTabs();
     }
 
     @Override
@@ -211,16 +217,12 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         super.addChatTabFirst(newTab);
         String serverIp = getCurrentServerIp();
         if(serverIp != null) {
-            ServerProfile profile = findBestProfile(serverIp);
-            if(profile != null) profile.addTabId(newTab.getId());
+            ServerTabProfile profile = getProfilesConfig().findProfile(serverIp);
+            if(profile != null && profile.getTabs() != null) {
+                profile.getTabs().add(0, newTab);
+                getProfilesConfig().save(profilesPath);
+            }
         }
-    }
-
-    private ServerProfile findBestProfile(String serverIp) {
-        return serverProfiles.stream()
-                .filter(profile -> serverIp.endsWith(profile.getServerAddress()))
-                .max(Comparator.comparingInt(p -> p.getServerAddress().length()))
-                .orElse(null);
     }
 
     private static String getCurrentServerIp() {
@@ -246,10 +248,9 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         this.showUnreadCounter = other.showUnreadCounter;
         this.tabDragAndDrop = other.tabDragAndDrop;
         this.tabAnimationFade = other.tabAnimationFade;
+        this.tabAppearAnimation = other.tabAppearAnimation;
         this.selectedTab = other.selectedTab;
         this.getChatTabs().clear();
         this.getChatTabs().addAll(other.getChatTabs());
-        this.serverProfiles.clear();
-        this.serverProfiles.addAll(other.serverProfiles);
     }
 }

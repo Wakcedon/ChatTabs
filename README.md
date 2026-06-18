@@ -1,48 +1,86 @@
 # ChatTabs Reloaded
 
-ChatTabs Reloaded is a fork and modern continuation of the original ChatTabs mod, maintained by Wakcedon with contributions from Gri11edHam.
+A modern Minecraft mod that adds tabbed chat organization. Filter messages into separate tabs per server, with per-tab send modifiers, color rules, and drag-and-drop management.
 
-What it does
-- Adds configurable chat tabs to the Minecraft chat UI.
-- Per-tab message filters, color rules, and send modifiers (prefix/suffix).
-- Server profile support: different tab sets per server.
-- Config GUI (Fabric only, via Cloth Config) — NeoForge build does not require Cloth at runtime.
+## Features
 
-Supported loaders and versions
-- Fabric: 1.21.x (Fabric Loader 0.18.x)
-- NeoForge: 1.21.x (NeoForge 21.x)
+- **Chat tabs** — messages are filtered into separate tabs based on regex rules
+- **Per-server profiles** — different tab sets for different servers, configured in `config/chattabs-profiles.json`
+- **Send modifiers** — auto-prepend/suffix when chatting from a specific tab (e.g. `!` for global chat)
+- **Drag & drop** — reorder tabs by dragging
+- **Unread counter** — shows number of unread messages per tab
+- **Fade animation** — tabs fade when chat closes
+- **Right-click context menu** — create, edit, delete, reorder tabs
+- **Tab editor** — in-game screen to configure name, filter regex, hex color, send modifier
+- **In-game commands** — `/chattabs` (alias `/ct`)
+- **NeoForge config screen** — accessible from Mods menu
 
-Supported languages
-- English (default)
-- Russian
-- Spanish
-- Chinese (Simplified)
+## Commands
 
-Quick links
-- Russian README: [README.ru.md](README.ru.md)
-- Contributing guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+| Command | Description |
+|---|---|
+| `/chattabs help` | Show command list |
+| `/chattabs reload` | Reload config and profiles from disk |
+| `/chattabs save` | Save current config to disk |
+| `/chattabs list` | List all configured tabs |
+| `/chattabs select <name>` | Switch to a tab by name |
+| `/chattabs tab add <name>` | Create a new tab |
+| `/chattabs tab remove <name>` | Delete a tab |
+| `/chattabs toggle <feature>` | Toggle unreadcounter / dragdrop / animation |
+| `/chattabs filter <tab> <regex>` | Set a tab's filter regex |
+| `/chattabs profile list` | List all server profiles |
+| `/chattabs profile current` | Show active profile for current server |
 
-How the project is organized
-- `src/main/java` — shared, loader-agnostic code and data models.
-- `fabric/` — Fabric entrypoints, Cloth-config UI, mod metadata and Loom build.
-- `neoforge/` — NeoForge wrapper metadata and ModDevGradle build.
+`/ct` is an alias for all `/chattabs` commands.
 
-Building locally
-Requirements: JDK 21 (recommended), Gradle wrapper
+## Configuration
 
-To build both artifacts locally:
+### `config/chattabs.json`
+Main mod settings: enabled state, tab colors, chat dimensions, animation toggle.
 
-```bash
-./gradlew -Pci=true :fabric:build :neoforge:build --no-daemon --parallel
+### `config/chattabs-profiles.json`
+Per-server tab profiles. Structure:
+
+```json
+{
+  "profiles": [
+    {
+      "serverIp": "mc.hypixel.net",
+      "name": "Hypixel",
+      "tabs": [
+        {
+          "id": "all",
+          "name": "All",
+          "visibleByDefault": true,
+          "filter": { "regex": ".*", "hexColor": -1 },
+          "sendModifier": { "prefix": "", "suffix": "" }
+        }
+      ]
+    }
+  ],
+  "defaultProfile": {
+    "name": "Default",
+    "tabs": [ ... ]
+  }
+}
 ```
 
-Outputs
-- `fabric/build/libs/` — Fabric remapped mod JAR
-- `neoforge/build/libs/` — NeoForge mod JAR
+- `profiles[]` — list of server-specific tab sets (matched by IP suffix)
+- `defaultProfile` — fallback tabs when no server matches
+- Each tab supports: `id`, `name`, `visibleByDefault`, `filter` (regex + hexColor), `sendModifier` (prefix + suffix)
 
-Translations
-- Russian: `neoforge/src/main/resources/assets/chattabs_reloaded/lang/ru_ru.json`
-- Spanish: `neoforge/src/main/resources/assets/chattabs_reloaded/lang/es_es.json`
-- Chinese (Simplified): `neoforge/src/main/resources/assets/chattabs_reloaded/lang/zh_cn.json`
+Share `chattabs-profiles.json` with friends — drop it in your `config` folder and it just works.
 
-If you'd like to help translate or contribute, see CONTRIBUTING.md.
+## Languages
+
+- English (default), Russian, Spanish, Chinese (Simplified)
+
+## Building
+
+Requirements: JDK 21, Gradle wrapper
+
+```bash
+./gradlew :neoforge:build
+```
+
+Output: `neoforge/build/libs/`

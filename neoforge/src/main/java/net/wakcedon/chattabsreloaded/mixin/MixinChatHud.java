@@ -54,11 +54,6 @@ public abstract class MixinChatHud implements IChatHud {
 
     @Unique
     private float chattabs$animAlpha = 0.0f;
-    @Unique
-    private float chattabs$animTarget = 0.0f;
-
-    @Unique
-    private float chattabs$chatSlideAnim = 0.0f;
 
     @Unique
     private final java.util.ArrayList<GhostTab> chattabs$removingTabs = new java.util.ArrayList<>();
@@ -73,11 +68,18 @@ public abstract class MixinChatHud implements IChatHud {
     private void chattabs$tickAnims() {
         Minecraft client = Minecraft.getInstance();
         boolean chatOpen = client.screen instanceof net.minecraft.client.gui.screens.ChatScreen;
+        ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
 
-        if(chatOpen && chattabs$chatSlideAnim < 1.0f) {
-            chattabs$chatSlideAnim = Math.min(chattabs$chatSlideAnim + 0.08f, 1.0f);
-        } else if(!chatOpen && chattabs$chatSlideAnim > 0.0f) {
-            chattabs$chatSlideAnim = Math.max(chattabs$chatSlideAnim - 0.08f, 0.0f);
+        if(config.tabAppearAnimation) {
+            if(chatOpen) {
+                chattabs$animAlpha = Math.min(chattabs$animAlpha + 0.08f, 1.0f);
+            } else if(config.tabAnimationFade) {
+                chattabs$animAlpha = Math.max(chattabs$animAlpha - 0.08f, 0.0f);
+            } else {
+                chattabs$animAlpha = 0.0f;
+            }
+        } else {
+            chattabs$animAlpha = chatOpen ? 1.0f : 0.0f;
         }
 
         java.util.Iterator<GhostTab> it = chattabs$removingTabs.iterator();
@@ -95,17 +97,6 @@ public abstract class MixinChatHud implements IChatHud {
         Minecraft client = Minecraft.getInstance();
         ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
         if(!config.enabled) return;
-
-        if(config.tabAnimationFade) {
-            boolean chatOpen = client.screen instanceof net.minecraft.client.gui.screens.ChatScreen;
-            if(chatOpen) {
-                chattabs$animAlpha = 1.0f;
-            } else {
-                chattabs$animAlpha = Math.max(chattabs$animAlpha - 0.08f, 0.0f);
-            }
-        } else {
-            chattabs$animAlpha = 1.0f;
-        }
 
         if(client.screen instanceof net.minecraft.client.gui.screens.ChatScreen) return;
 
@@ -127,7 +118,7 @@ public abstract class MixinChatHud implements IChatHud {
         if(chattabs$removingTabs.isEmpty()) return;
         float alpha = chattabs$animAlpha;
         int x = 4 + 12 + 2;
-        int y = net.minecraft.util.Mth.floor(windowHeight / chatScale) - 17;
+        int y = net.minecraft.util.Mth.floor(windowHeight / chatScale) - 19;
         int height = 13;
         for(GhostTab gt : chattabs$removingTabs) {
             String name = "x " + gt.name;

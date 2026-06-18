@@ -40,31 +40,14 @@ public abstract class MixinChatScreen extends Screen {
     @Unique
     private int chattabs$hoveredTab = -1;
 
-    @Unique
-    private int chattabs$savedInputY;
-
     protected MixinChatScreen(Component title) {
         super(title);
-    }
-
-    @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", at = @At("HEAD"))
-    private void chattabs$onRenderHead(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        IChatHud chatHud = (IChatHud)this.minecraft.gui.getChat();
-        float slideAnim = chatHud.chatTabs$getChatSlideAnim();
-        if(slideAnim < 1.0f) {
-            chattabs$savedInputY = input.getY();
-            int slideOffset = (int)((1.0f - slideAnim) * 30);
-            input.setY(input.getY() + slideOffset);
-        }
     }
 
     @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", at = @At("TAIL"))
     private void renderChatContextMenu(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         ((IChatHud)this.minecraft.gui.getChat()).chatTabs$renderContextMenu(context, width, height, mouseX, mouseY, deltaTicks);
         chattabs$renderTabs(context, mouseX, mouseY);
-        if(((IChatHud)this.minecraft.gui.getChat()).chatTabs$getChatSlideAnim() < 1.0f) {
-            input.setY(chattabs$savedInputY);
-        }
     }
 
     @Unique
@@ -76,7 +59,7 @@ public abstract class MixinChatScreen extends Screen {
         if(!config.enabled) return;
 
         IChatHud chatHud = (IChatHud)client.gui.getChat();
-        float alpha = config.tabAnimationFade ? chatHud.chatTabs$getAnimAlpha() : 1.0f;
+        float alpha = Math.max(chatHud.chatTabs$getAnimAlpha(), 0.001f);
 
         int windowHeight = client.getWindow().getGuiScaledHeight();
         float chatScale = client.options.chatScale().get().floatValue();
@@ -107,7 +90,7 @@ public abstract class MixinChatScreen extends Screen {
                 }
             }
 
-            int tabY = Mth.floor((windowHeight - baseYOffset) / chatScale) - 17;
+            int tabY = Mth.floor((windowHeight - baseYOffset) / chatScale) - 19;
 
             int indicatorX = dropIdx < tabMidpoints.size()
                 ? tabMidpoints.get(dropIdx)
@@ -135,17 +118,23 @@ public abstract class MixinChatScreen extends Screen {
             float ga = a * gt.alpha;
             if(ga > 0.01f) {
                 int gx = 4;
-                int gy = Mth.floor((windowHeight - baseYOffset) / chatScale) - 17;
+                int gy = Mth.floor((windowHeight - baseYOffset) / chatScale) - 19;
                 ChatHudOverlays.fillRoundedRect(guiGraphics, gx, gy, w, 13, 0x44FF4444, ga);
                 guiGraphics.drawString(client.font, name, gx + 3, gy + 2, 0xFFFFFF | (Math.round(255 * ga) << 24));
             }
         }
     }
 
+    @Inject(method = "handleChatInput", at = @At("HEAD"), cancellable = true)
+    private void chattabs$onHandleChatInput(String input, CallbackInfoReturnable<Boolean> cir) {
+        if(ChatTabsCommands.handleCommand(input)) {
+            cir.setReturnValue(true);
+            cir.cancel();
+        }
+    }
+
     @Redirect(method = "handleChatInput", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendChat(Ljava/lang/String;)V"))
     private void modifyChatMessage(ClientPacketListener instance, String content) {
-        if(ChatTabsCommands.handleCommand(content)) return;
-
         ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
         if(config.enabled) {
             ChatTab selectedTab = config.getSelectedChatTab();

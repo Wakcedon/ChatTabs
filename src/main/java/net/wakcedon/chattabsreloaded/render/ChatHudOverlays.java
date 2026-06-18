@@ -42,7 +42,7 @@ public class ChatHudOverlays {
         int height = 13;
         int x = 4;
         int y = Mth.floor((windowHeight - baseYOffset) / chatScale);
-        y -= ((messages * (int)(9 * (client.options.chatLineSpacing().get() + 1))) + height + 5);
+        y -= ((messages * (int)(9 * (client.options.chatLineSpacing().get() + 1))) + height + 6);
         int scrollerWidth = client.font.width("<") + 6;
         int tabNum = 0;
         int width;
@@ -89,7 +89,11 @@ public class ChatHudOverlays {
             if(config.selectedTab == tabNum) {
                 fillRoundedRect(context, x - 1, y - 1, width + 2, height + 2, config.selectedTabColor.getRGB(), alpha);
             } else if(tab.hasUnreads()) {
-                fillRoundedRect(context, x - 1, y - 1, width + 2, height + 2, config.unreadColor.getRGB(), alpha);
+                int base = config.unreadColor.getRGB();
+                float pulse = (float)((Math.sin(System.currentTimeMillis() / 300.0 * Math.PI * 2) + 1.0) / 2.0);
+                int pa = Math.round(((base >> 24) & 0xFF) * (0.2f + 0.8f * pulse));
+                int pc = (pa << 24) | (base & 0x00FFFFFF);
+                fillRoundedRect(context, x - 1, y - 1, width + 2, height + 2, pc, alpha);
             }
             fillRoundedRect(context, x, y, width, height, hovered ? config.bgColorHovered.getRGB() : config.bgColor.getRGB(), alpha);
             context.drawString(client.font, tabNameStr, x + 3, y + 2, -1, config.textShadow);

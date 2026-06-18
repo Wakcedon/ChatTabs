@@ -30,73 +30,70 @@ public class TabEditScreen extends Screen {
     @Override
     protected void init() {
         int cx = width / 2;
-        int fw = Math.min(font.width("W") * 22, width - 80);
+        int fw = Math.min(300, width - 60);
         int left = cx - fw / 2;
-        int right = cx + fw / 2;
-        int halfW = (fw - 10) / 2;
+        int halfW = (fw - 12) / 2;
+        int rowH = 22;
+        int gap = 10;
         int y = 50;
 
-        addRenderableWidget(Button.builder(Component.translatable("gui.back"), b -> onClose())
-                .bounds(4, 4, 50, 20).build());
-
-        nameField = new EditBox(font, left, y, fw, 20, Component.translatable("chattabsconfig.chattab.name"));
+        nameField = new EditBox(font, left, y, fw, rowH, Component.translatable("chattabsconfig.chattab.name"));
         nameField.setValue(tab.getName());
         nameField.setMaxLength(64);
         addRenderableWidget(nameField);
-        y += 30;
+        y += rowH + gap + 14;
 
-        filterField = new EditBox(font, left, y, fw, 20, Component.translatable("chattabsconfig.chattab.filter.regex"));
+        filterField = new EditBox(font, left, y, fw, rowH, Component.translatable("chattabsconfig.chattab.filter.regex"));
         filterField.setValue(tab.getFilter().getRegex());
         filterField.setMaxLength(256);
         addRenderableWidget(filterField);
-        y += 28;
+        y += rowH + gap + 14;
 
         filterDMsBtn = addRenderableWidget(Button.builder(
-                Component.translatable("chattabsconfig.chattab.filter.messages").append(": ")
-                        .append(Component.literal(tab.getFilter().filtersMessages() ? "§aON" : "§cOFF")),
+                makeToggleLabel("chattabsconfig.chattab.filter.messages", tab.getFilter().filtersMessages()),
                 b -> {
                     tab.getFilter().filterMessages(!tab.getFilter().filtersMessages());
-                    String val = tab.getFilter().filtersMessages() ? "§aON" : "§cOFF";
-                    b.setMessage(Component.translatable("chattabsconfig.chattab.filter.messages").append(": ").append(Component.literal(val)));
+                    b.setMessage(makeToggleLabel("chattabsconfig.chattab.filter.messages", tab.getFilter().filtersMessages()));
                 })
                 .bounds(left, y, fw, 20).build());
-        y += 24;
+        y += 26;
 
         visibleBtn = addRenderableWidget(Button.builder(
-                Component.translatable("chattabsconfig.chattab.visiblebydefault").append(": ")
-                        .append(Component.literal(tab.isVisibleByDefault() ? "§aON" : "§cOFF")),
+                makeToggleLabel("chattabsconfig.chattab.visiblebydefault", tab.isVisibleByDefault()),
                 b -> {
                     tab.setVisibleByDefault(!tab.isVisibleByDefault());
-                    String val = tab.isVisibleByDefault() ? "§aON" : "§cOFF";
-                    b.setMessage(Component.translatable("chattabsconfig.chattab.visiblebydefault").append(": ").append(Component.literal(val)));
+                    b.setMessage(makeToggleLabel("chattabsconfig.chattab.visiblebydefault", tab.isVisibleByDefault()));
                 })
                 .bounds(left, y, fw, 20).build());
-        y += 28;
+        y += 30;
 
-        prefixField = new EditBox(font, left, y, halfW, 20, Component.translatable("chattabsconfig.chattab.sendmodifier.prefix"));
+        prefixField = new EditBox(font, left, y, halfW, rowH, Component.translatable("chattabsconfig.chattab.sendmodifier.prefix"));
         prefixField.setValue(tab.getSendModifier().getPrefix());
         prefixField.setMaxLength(32);
         addRenderableWidget(prefixField);
 
-        suffixField = new EditBox(font, left + halfW + 10, y, halfW, 20, Component.translatable("chattabsconfig.chattab.sendmodifier.suffix"));
+        suffixField = new EditBox(font, left + halfW + 12, y, halfW, rowH, Component.translatable("chattabsconfig.chattab.sendmodifier.suffix"));
         suffixField.setValue(tab.getSendModifier().getSuffix());
         suffixField.setMaxLength(32);
         addRenderableWidget(suffixField);
-        y += 28;
+        y += rowH + gap + 14;
 
-        hexColorField = new EditBox(font, left, y, fw, 20, Component.translatable("chattabsconfig.chattab.filter.color.hex"));
+        hexColorField = new EditBox(font, left, y, fw, rowH, Component.translatable("chattabsconfig.chattab.filter.color.hex"));
         String hex = String.format("#%06X", tab.getFilter().getHexColor() & 0xFFFFFF);
         hexColorField.setValue(hex);
         hexColorField.setMaxLength(7);
         addRenderableWidget(hexColorField);
-        y += 32;
 
-        y = Math.max(y, height - 50);
+        int btnW = 110;
+        int btnGap = 14;
+        int btnsW = btnW * 2 + btnGap;
+        int btnsLeft = cx - btnsW / 2;
+        y = Math.max(y + rowH + gap + 16, height - 40);
 
-        addRenderableWidget(Button.builder(Component.translatable("chattabsconfig.chattab.save"), b -> save())
-                .bounds(right - 105, y, 100, 20).build());
         addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), b -> onClose())
-                .bounds(right - 210, y, 100, 20).build());
+                .bounds(btnsLeft, y, btnW, 20).build());
+        addRenderableWidget(Button.builder(Component.translatable("chattabsconfig.chattab.save"), b -> save())
+                .bounds(btnsLeft + btnW + btnGap, y, btnW, 20).build());
     }
 
     private void save() {
@@ -116,11 +113,40 @@ public class TabEditScreen extends Screen {
         super.render(ctx, mx, my, delta);
 
         int cx = width / 2;
-        int fw = Math.min(font.width("W") * 22, width - 80);
+        int fw = Math.min(300, width - 60);
         int left = cx - fw / 2;
-        int y = 20;
+        int halfW = (fw - 12) / 2;
+        int rowH = 22;
+        int gap = 10;
+        int y = 36;
 
-        ctx.drawString(font, Component.translatable("chattabs.tabedit.title"), cx - font.width(Component.translatable("chattabs.tabedit.title")) / 2, y, 0xFFFFFF);
+        ctx.drawString(font, Component.translatable("chattabs.tabedit.title"),
+                cx - font.width(Component.translatable("chattabs.tabedit.title")) / 2, 20, 0xFFFFFF);
+
+        ctx.drawString(font, Component.translatable("chattabsconfig.chattab.name"),
+                cx - font.width(Component.translatable("chattabsconfig.chattab.name")) / 2, y, 0xAAAAAA);
+        y += rowH + gap + 14;
+
+        ctx.drawString(font, Component.translatable("chattabsconfig.chattab.filter.regex"),
+                cx - font.width(Component.translatable("chattabsconfig.chattab.filter.regex")) / 2, y, 0xAAAAAA);
+        y += rowH + gap + 14;
+
+        y += 26 + 30;
+        y -= 14;
+
+        ctx.drawString(font, Component.translatable("chattabsconfig.chattab.sendmodifier.prefix"),
+                left + halfW / 2 - font.width(Component.translatable("chattabsconfig.chattab.sendmodifier.prefix")) / 2, y, 0xAAAAAA);
+        ctx.drawString(font, Component.translatable("chattabsconfig.chattab.sendmodifier.suffix"),
+                left + halfW + 12 + halfW / 2 - font.width(Component.translatable("chattabsconfig.chattab.sendmodifier.suffix")) / 2, y, 0xAAAAAA);
+        y += rowH + gap + 14;
+
+        ctx.drawString(font, Component.translatable("chattabsconfig.chattab.filter.color.hex"),
+                cx - font.width(Component.translatable("chattabsconfig.chattab.filter.color.hex")) / 2, y, 0xAAAAAA);
+    }
+
+    private Component makeToggleLabel(String key, boolean value) {
+        return Component.translatable(key).append(": ").append(
+                Component.literal(value ? "§aON" : "§cOFF"));
     }
 
     @Override

@@ -37,6 +37,7 @@ public class NeoForgeMod {
         ChatTabs.init();
         config = new NeoForgeChatTabsConfig(FMLPaths.CONFIGDIR.get().resolve("chattabs.json"));
         config.load();
+        config.loadProfiles();
     }
 
     public static NeoForgeChatTabsConfig getConfig() {

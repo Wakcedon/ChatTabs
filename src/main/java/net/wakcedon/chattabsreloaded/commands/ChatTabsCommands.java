@@ -1,6 +1,9 @@
 package net.wakcedon.chattabsreloaded.commands;
 
 import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
+import net.wakcedon.chattabsreloaded.config.NeoForgeChatTabsConfig;
+import net.wakcedon.chattabsreloaded.config.ProfilesConfig;
+import net.wakcedon.chattabsreloaded.profiles.ServerTabProfile;
 import net.wakcedon.chattabsreloaded.tabs.ChatLineFilter;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
 import net.wakcedon.chattabsreloaded.tabs.SendModifier;
@@ -12,10 +15,18 @@ import java.util.List;
 public class ChatTabsCommands {
 
     public static boolean handleCommand(String input) {
-        if(!input.startsWith("/ct") || (input.length() > 3 && input.charAt(3) != ' ')) return false;
+        if(input.startsWith("/chattabs")) {
+            String args = input.length() > 9 ? input.substring(10).trim() : "";
+            return execute(args);
+        }
+        if(input.startsWith("/ct")) {
+            String args = input.length() > 3 ? input.substring(4).trim() : "";
+            return execute(args);
+        }
+        return false;
+    }
 
-        String args = input.length() > 4 ? input.substring(4).trim() : "";
-
+    private static boolean execute(String args) {
         if(args.isEmpty() || args.equals("help")) {
             sendHelp();
             return true;
@@ -32,15 +43,17 @@ public class ChatTabsCommands {
             case "list":
                 return handleList();
             case "select":
-                return parts.length > 1 ? handleSelect(args.substring(7).trim()) : error("Usage: /ct select <name>");
+                return parts.length > 1 ? handleSelect(args.substring(7).trim()) : error("Usage: /chattabs select <name>");
             case "tab":
                 return handleTab(args.substring(4).trim());
             case "toggle":
-                return parts.length > 1 ? handleToggle(args.substring(7).trim()) : error("Usage: /ct toggle <feature>");
+                return parts.length > 1 ? handleToggle(args.substring(7).trim()) : error("Usage: /chattabs toggle <feature>");
             case "filter":
-                return parts.length > 2 ? handleFilter(parts[1], args.substring(parts[0].length() + parts[1].length() + 2).trim()) : error("Usage: /ct filter <tabName> <regex>");
+                return parts.length > 2 ? handleFilter(parts[1], args.substring(parts[0].length() + parts[1].length() + 2).trim()) : error("Usage: /chattabs filter <tabName> <regex>");
+            case "profile":
+                return handleProfile(args.substring(8).trim());
             default:
-                return error("Unknown command. Use /ct help");
+                return error("Unknown command. Use /chattabs help");
         }
     }
 
@@ -58,20 +71,25 @@ public class ChatTabsCommands {
 
     private static void sendHelp() {
         message("§eAvailable commands:");
-        message(" §7/ct help §8- Show this help");
-        message(" §7/ct reload §8- Reload config from file");
-        message(" §7/ct save §8- Save config to file");
-        message(" §7/ct list §8- List all tabs");
-        message(" §7/ct select <name> §8- Select a tab");
-        message(" §7/ct tab add <name> §8- Create a new tab");
-        message(" §7/ct tab remove <name> §8- Remove a tab");
-        message(" §7/ct toggle <feature> §8- Toggle a feature");
-        message(" §7/ct filter <tab> <regex> §8- Set tab filter regex");
+        message(" §7/chattabs help §8- Show this help");
+        message(" §7/chattabs reload §8- Reload config from file");
+        message(" §7/chattabs save §8- Save config to file");
+        message(" §7/chattabs list §8- List all tabs");
+        message(" §7/chattabs select <name> §8- Select a tab");
+        message(" §7/chattabs tab add <name> §8- Create a new tab");
+        message(" §7/chattabs tab remove <name> §8- Remove a tab");
+        message(" §7/chattabs toggle <feature> §8- Toggle a feature");
+        message(" §7/chattabs filter <tab> <regex> §8- Set tab filter regex");
+        message(" §7/chattabs profile list §8- List all server profiles");
+        message(" §7/chattabs profile current §8- Show current profile");
+        message(" §7/ct ... §8- Alias for /chattabs commands");
     }
 
     private static boolean handleReload() {
-        ChatTabsConfigBase.getInstance().load();
-        message("§aConfig reloaded.");
+        ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
+        config.load();
+        config.reloadProfiles();
+        message("§aConfig and profiles reloaded.");
         return true;
     }
 
@@ -114,7 +132,7 @@ public class ChatTabsCommands {
 
     private static boolean handleTab(String args) {
         String[] parts = args.split(" ", 2);
-        if(parts.length < 2) return error("Usage: /ct tab add|remove <name>");
+        if(parts.length < 2) return error("Usage: /chattabs tab add|remove <name>");
         String sub = parts[0].toLowerCase();
         String name = parts[1];
 
@@ -146,7 +164,7 @@ public class ChatTabsCommands {
                 return error("Tab not found: " + name);
             }
             default:
-                return error("Usage: /ct tab add|remove <name>");
+                return error("Usage: /chattabs tab add|remove <name>");
         }
     }
 
@@ -163,6 +181,12 @@ public class ChatTabsCommands {
                 config.tabDragAndDrop = !config.tabDragAndDrop;
                 message("§aDrag & drop: " + (config.tabDragAndDrop ? "§aon" : "§coff"));
                 break;
+            case "appear":
+            case "appearanimation":
+            case "tabappearanimation":
+                config.tabAppearAnimation = !config.tabAppearAnimation;
+                message("§aTab appear animation: " + (config.tabAppearAnimation ? "§aon" : "§coff"));
+                break;
             case "animation":
             case "fade":
             case "tabanimationfade":
@@ -170,10 +194,59 @@ public class ChatTabsCommands {
                 message("§aTab fade animation: " + (config.tabAnimationFade ? "§aon" : "§coff"));
                 break;
             default:
-                return error("Unknown feature. Available: unreadcounter, dragdrop, animation");
+                return error("Unknown feature. Available: unreadcounter, dragdrop, appearanimation, animation");
         }
         config.save();
         return true;
+    }
+
+    private static boolean handleProfile(String args) {
+        if(args.isEmpty() || args.equals("list")) {
+            ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
+            config.reloadProfiles();
+            message("§eAvailable profiles:");
+            if(config instanceof NeoForgeChatTabsConfig ncfg) {
+                ProfilesConfig pc = ncfg.getProfilesConfig();
+                List<ServerTabProfile> profiles = pc.getProfiles();
+                if(profiles.isEmpty()) {
+                    message(" §7No custom profiles defined.");
+                } else {
+                    for(ServerTabProfile p : profiles) {
+                        int tc = p.getTabs() != null ? p.getTabs().size() : 0;
+                        message(" §7" + p.getServerIp() + " §8(" + tc + " tabs)");
+                    }
+                }
+                ServerTabProfile def = pc.getDefaultProfile();
+                if(def != null && def.getTabs() != null) {
+                    message(" §7default §8(" + def.getTabs().size() + " tabs)");
+                }
+            } else {
+                message(" §7No profile config loaded.");
+            }
+            return true;
+        }
+        if(args.equals("current")) {
+            String ip = Minecraft.getInstance().getCurrentServer() != null
+                ? Minecraft.getInstance().getCurrentServer().ip : null;
+            if(ip == null) {
+                message("§eNot connected to any server.");
+                return true;
+            }
+            message("§eCurrent server: §f" + ip);
+            ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
+            if(config instanceof NeoForgeChatTabsConfig ncfg) {
+                ServerTabProfile profile = ncfg.getProfilesConfig().findProfile(ip);
+                if(profile != null) {
+                    message(" §7Profile: §f" + (profile.getName() != null ? profile.getName() : profile.getServerIp()));
+                    int tabCount = profile.getTabs() != null ? profile.getTabs().size() : 0;
+                    message(" §7Tabs: §f" + tabCount);
+                } else {
+                    message(" §7No matching profile (using default tabs).");
+                }
+            }
+            return true;
+        }
+        return error("Usage: /chattabs profile list|current");
     }
 
     private static boolean handleFilter(String tabName, String regex) {
