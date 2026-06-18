@@ -242,16 +242,6 @@ public abstract class MixinChatHud implements IChatHud {
     }
 
     @Override
-    public void chatTabs$setAnimTarget(boolean visible) {
-        chattabs$animTarget = visible ? 1.0f : 0.0f;
-    }
-
-    @Override
-    public float chatTabs$getChatSlideAnim() {
-        return chattabs$chatSlideAnim;
-    }
-
-    @Override
     public void chatTabs$showRemoveAnim(String tabId, String tabName) {
         chattabs$removingTabs.add(new GhostTab(tabId, tabName));
     }
