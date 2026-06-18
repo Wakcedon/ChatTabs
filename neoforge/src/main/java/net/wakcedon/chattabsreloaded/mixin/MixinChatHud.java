@@ -398,7 +398,7 @@ public abstract class MixinChatHud implements IChatHud {
                         ChatTab tab = visibleTabs.get(hoveredTabAtCreation);
                         int allIdx = config.getChatTabs().indexOf(tab);
                         if(allIdx >= 0) {
-                            chattabs$showRemoveAnim(tab.getId(), tab.getName());
+                            chatTabs$showRemoveAnim(tab.getId(), tab.getName());
                             config.getChatTabs().remove(allIdx);
                             if(config.selectedTab >= allIdx) config.selectedTab--;
                         }

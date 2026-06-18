@@ -134,7 +134,6 @@ public abstract class MixinChatScreen extends Screen {
             int w = tw + 8;
             float ga = a * gt.alpha;
             if(ga > 0.01f) {
-                int windowHeight = client.getWindow().getGuiScaledHeight();
                 int gx = 4;
                 int gy = Mth.floor((windowHeight - baseYOffset) / chatScale) - 17;
                 ChatHudOverlays.fillRoundedRect(guiGraphics, gx, gy, w, 13, 0x44FF4444, ga);
