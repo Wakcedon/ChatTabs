@@ -50,7 +50,7 @@ public class ChatHudOverlays {
         if(tabScroll > -1) {
             hovered = (mouseX >= x && mouseX < x + scrollerWidth && mouseY >= y && mouseY < y + height) && !(client.screen instanceof EditChatScreen);
             fillRoundedRect(context, x, y, scrollerWidth, height, hovered ? config.bgColorHovered.getRGB() : config.bgColor.getRGB(), alpha);
-            context.drawString(client.font, "<", x + 2, y + 2, -1, config.textShadow);
+            context.drawString(client.font, "<", x + 2, y + 2, applyAlpha(0xFFFFFFFF, alpha), config.textShadow);
             if(hovered) {
                 hoveredTab = -2;
             }
@@ -71,7 +71,7 @@ public class ChatHudOverlays {
             if(config.showUnreadCounter && config.selectedTab != tabNum && tab.hasUnreads()) {
                 int count = tab.getUnreadCount();
                 badgeText = count > 99 ? "99+" : String.valueOf(count);
-                badgeW = Math.max(12, client.font.width(badgeText) + 6);
+                badgeW = Math.max(8, client.font.width(badgeText) + 4);
             }
             width = textWidth + 8 + (badgeText != null ? 4 + badgeW : 0);
             if(x + width > chatWidth - scrollerWidth) {
@@ -79,7 +79,7 @@ public class ChatHudOverlays {
                 hovered = (mouseX >= chatWidth - scrollerWidth && mouseX < chatWidth && mouseY >= y && mouseY < y + height) && !(client.screen instanceof EditChatScreen);
                 fillRoundedRect(context, chatWidth - scrollerWidth, y, scrollerWidth, height, hovered ? config.bgColorHovered.getRGB() : config.bgColor.getRGB(), alpha);
                 context.fill(x, y, chatWidth - scrollerWidth, y + height, applyAlpha(config.bgColor.getRGB(), alpha));
-                context.drawString(client.font, ">", chatWidth - scrollerWidth + 2, y + 2, -1, config.textShadow);
+                context.drawString(client.font, ">", chatWidth - scrollerWidth + 2, y + 2, applyAlpha(0xFFFFFFFF, alpha), config.textShadow);
                 if(hovered) {
                     hoveredTab = -3;
                 }
@@ -102,12 +102,13 @@ public class ChatHudOverlays {
                 }
             }
             fillRoundedRect(context, x, y, width, height, hovered ? config.bgColorHovered.getRGB() : config.bgColor.getRGB(), alpha);
-            context.drawString(client.font, tabNameStr, x + 3, y + 2, -1, config.textShadow);
+            int textColor = applyAlpha(0xFFFFFFFF, alpha);
+            context.drawString(client.font, tabNameStr, x + 3, y + 2, textColor, config.textShadow);
             if(badgeText != null) {
                 int badgeX = x + 3 + textWidth + 4;
-                int badgeY = y + (height - 12) / 2;
-                fillRoundedRect(context, badgeX, badgeY, badgeW, 12, applyAlpha(0xFFFF4444, alpha), alpha);
-                context.drawString(client.font, badgeText, badgeX + (badgeW - client.font.width(badgeText)) / 2, badgeY + 2, -1, config.textShadow);
+                int badgeY = y + (height - 10) / 2;
+                fillRoundedRect(context, badgeX, badgeY, badgeW, 10, applyAlpha(0xFFFF4444, alpha), alpha);
+                context.drawString(client.font, badgeText, badgeX + (badgeW - client.font.width(badgeText)) / 2, badgeY + 1, textColor, config.textShadow);
             }
             if(tabMidpointsOut != null) {
                 tabMidpointsOut.add(x + width / 2);

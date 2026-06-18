@@ -202,14 +202,15 @@ public abstract class MixinChatHud implements IChatHud {
         if(chattabs$hoveredTab >= 0) {
             if(button == 1) {
                 chattabs$showTabContextMenu(client, (int)mouseX, (int)mouseY);
-            } else if(config.tabDragAndDrop) {
+            } else {
                 java.util.List<ChatTab> visible = config.getVisibleChatTabs();
                 if(chattabs$hoveredTab < visible.size()) {
-                    int actualIdx = config.getChatTabs().indexOf(visible.get(chattabs$hoveredTab));
-                    chatTabs$startDrag(actualIdx, (int)mouseX, (int)mouseY, 0);
+                    chattabs$selectTab(chattabs$hoveredTab);
+                    if(config.tabDragAndDrop) {
+                        int actualIdx = config.getChatTabs().indexOf(visible.get(chattabs$hoveredTab));
+                        chatTabs$startDrag(actualIdx, (int)mouseX, (int)mouseY, 0);
+                    }
                 }
-            } else {
-                chattabs$selectTab(chattabs$hoveredTab);
             }
             return true;
         }
@@ -228,6 +229,10 @@ public abstract class MixinChatHud implements IChatHud {
 
     @Override
     public boolean chatTabs$mouseReleased(double mouseX, double mouseY, int button) {
+        if(chattabs$dragging) {
+            chatTabs$endDrag((int)mouseX);
+            return true;
+        }
         return false;
     }
 
