@@ -84,5 +84,6 @@
 
   "chattabs.tab.all": "Todo",
   "chattabs.tab.global": "Global",
-  "chattabs.tab.local": "Local"
+  "chattabs.tab.local": "Local",
+  "chattabs.tab.notifications": "Notificaciones"
 }

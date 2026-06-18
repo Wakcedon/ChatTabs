@@ -5,7 +5,6 @@ import net.wakcedon.chattabsreloaded.mixininterface.IChatHud;
 import net.wakcedon.chattabsreloaded.render.ChatContextMenu;
 import net.wakcedon.chattabsreloaded.render.ChatHudOverlays;
 import net.wakcedon.chattabsreloaded.render.GhostTab;
-import net.wakcedon.chattabsreloaded.render.screen.EditChatScreen;
 import net.wakcedon.chattabsreloaded.render.screen.TabEditScreen;
 import net.wakcedon.chattabsreloaded.tabs.ChatLine;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
@@ -99,12 +98,10 @@ public abstract class MixinChatHud implements IChatHud {
 
         if(config.tabAnimationFade) {
             boolean chatOpen = client.screen instanceof net.minecraft.client.gui.screens.ChatScreen;
-            float target = chatOpen ? 1.0f : 0.0f;
-            chattabs$animTarget = target;
-            if(chattabs$animAlpha < target) {
-                chattabs$animAlpha = Math.min(chattabs$animAlpha + 0.12f, target);
-            } else if(chattabs$animAlpha > target) {
-                chattabs$animAlpha = Math.max(chattabs$animAlpha - 0.12f, target);
+            if(chatOpen) {
+                chattabs$animAlpha = 1.0f;
+            } else {
+                chattabs$animAlpha = Math.max(chattabs$animAlpha - 0.08f, 0.0f);
             }
         } else {
             chattabs$animAlpha = 1.0f;
@@ -412,11 +409,6 @@ public abstract class MixinChatHud implements IChatHud {
             }),
             new ChatContextMenu.Element(Component.translatable("chattabsconfig.contextmenu.tab.moveright"), () -> {
                 chattabs$moveTab(hoveredTabAtCreation, 1);
-                chattabs$contextMenu = null;
-            }),
-            new ChatContextMenu.Element(),
-            new ChatContextMenu.Element(Component.translatable("chattabsconfig.contextmenu.chat.configure"), () -> {
-                Minecraft.getInstance().setScreen(new EditChatScreen(null));
                 chattabs$contextMenu = null;
             })
         );

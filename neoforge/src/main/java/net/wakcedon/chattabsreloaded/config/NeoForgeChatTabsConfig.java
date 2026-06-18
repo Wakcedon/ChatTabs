@@ -71,7 +71,14 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         // Russian
         "Глобальный", "Глобал", "Г", "Сервер", "Объявление",
         "Админ", "Модератор", "Мод", "Ивент", "Мир",
-        "Торговля", "Аукцион", "Важно"
+        "Торговля", "Аукцион", "Важно",
+        // Spanish
+        "Global", "Servidor", "Anuncio", "Staff", "Admin",
+        "Evento", "Mundo", "Subasta", "Consejo", "Aviso",
+        // Chinese
+        "全球", "服务器", "公告", "工作人员", "管理员",
+        "活动", "世界", "交易", "拍卖", "提示",
+        "信息", "系统", "通知"
     };
 
     private static final String[] GLOBAL_CIRCLED = {
@@ -82,11 +89,30 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         // English
         "Local", "L",
         // Russian
-        "Локальный", "Локал", "Л"
+        "Локальный", "Локал", "Л",
+        // Spanish
+        "Local",
+        // Chinese
+        "本地"
     };
 
     private static final String[] LOCAL_CIRCLED = {
         "🄻", "Ⓛ", "🅛", "🅻", "📍"
+    };
+
+    private static final String[] NOTIFICATION_TAGS = {
+        // English
+        "!", "Server", "Info", "INF", "Notice", "Alert",
+        "System", "Notification", "PSA", "Warning",
+        // Russian
+        "!", "Сервер", "ИНФО", "Информация", "Система",
+        "Уведомление", "Важно", "Объявление", "Предупреждение",
+        // Spanish
+        "!", "Servidor", "Info", "Aviso", "Sistema",
+        "Notificación", "Importante", "Anuncio", "Advertencia",
+        // Chinese
+        "!", "服务器", "信息", "通知", "系统",
+        "公告", "重要", "警告"
     };
 
     private static String buildGlobalRegex() {
@@ -103,6 +129,11 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         return "^(?![!?])(?!.*(?:" + globalCircled + "))(?!.*\\[(?:" + globalTags + ")\\])(?:.*(?:" + localCircled + ").*|.*\\[(?:" + localTags + ")\\].*|.*: .*|.*<[^>]+>.*)";
     }
 
+    private static String buildNotificationRegex() {
+        String tags = String.join("|", NOTIFICATION_TAGS);
+        return ".*\\[(?:" + tags + ")\\].*";
+    }
+
     private void createDefaultTabs() {
         ArrayList<ChatTab> defaults = new ArrayList<>();
         defaults.add(new ChatTab("tab.all", "chattabs.tab.all", true, true,
@@ -114,8 +145,11 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         defaults.add(new ChatTab("tab.local", "chattabs.tab.local", true, true,
                 new ChatLineFilter(buildLocalRegex(), false),
                 new SendModifier()));
+        defaults.add(new ChatTab("tab.notifications", "chattabs.tab.notifications", true, true,
+                new ChatLineFilter(buildNotificationRegex(), false),
+                new SendModifier()));
         getChatTabs().addAll(defaults);
-        ChatTabs.LOGGER.info("Created 3 default tabs");
+        ChatTabs.LOGGER.info("Created 4 default tabs");
     }
 
     @Override

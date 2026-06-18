@@ -84,5 +84,6 @@
 
   "chattabs.tab.all": "Все",
   "chattabs.tab.global": "Глобальный",
-  "chattabs.tab.local": "Локальный"
+  "chattabs.tab.local": "Локальный",
+  "chattabs.tab.notifications": "Уведомления"
 }

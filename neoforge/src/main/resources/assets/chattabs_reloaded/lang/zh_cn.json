@@ -84,5 +84,6 @@
 
   "chattabs.tab.all": "全部",
   "chattabs.tab.global": "全局",
-  "chattabs.tab.local": "本地"
+  "chattabs.tab.local": "本地",
+  "chattabs.tab.notifications": "通知"
 }

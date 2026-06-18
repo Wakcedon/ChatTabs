@@ -10,8 +10,8 @@ import java.util.List;
 
 public class ChatContextMenu {
     
-    private static final int ELEMENT_HEIGHT = 12;
-    private static final int DIVIDER_HEIGHT = 1;
+    private static final int ELEMENT_HEIGHT = 16;
+    private static final int DIVIDER_HEIGHT = 2;
     
     private int x;
     private int y;

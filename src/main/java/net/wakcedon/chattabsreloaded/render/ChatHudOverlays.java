@@ -42,7 +42,7 @@ public class ChatHudOverlays {
         int height = 13;
         int x = 4;
         int y = Mth.floor((windowHeight - baseYOffset) / chatScale);
-        y -= ((messages * (int)(9 * (client.options.chatLineSpacing().get() + 1))) + height + 4);
+        y -= ((messages * (int)(9 * (client.options.chatLineSpacing().get() + 1))) + height + 5);
         int scrollerWidth = client.font.width("<") + 6;
         int tabNum = 0;
         int width;
@@ -106,7 +106,7 @@ public class ChatHudOverlays {
                 hoveredTab = tabNum;
             }
             tabNum++;
-            x += width + 4;
+            x += width + 5;
         }
         
         if(shouldScrollTabs && tabScroll < 0) {
