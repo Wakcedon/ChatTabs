@@ -126,10 +126,9 @@ public abstract class MixinChatScreen extends Screen {
     }
 
     @Inject(method = "handleChatInput", at = @At("HEAD"), cancellable = true)
-    private void chattabs$onHandleChatInput(String input, CallbackInfoReturnable<Boolean> cir) {
+    private void chattabs$onHandleChatInput(String input, boolean addToRecentChat, CallbackInfo ci) {
         if(ChatTabsCommands.handleCommand(input)) {
-            cir.setReturnValue(true);
-            cir.cancel();
+            ci.cancel();
         }
     }
 
