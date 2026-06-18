@@ -177,7 +177,7 @@ public abstract class MixinChatHud implements IChatHud {
                 java.util.List<ChatTab> visible = config.getVisibleChatTabs();
                 if(chattabs$hoveredTab < visible.size()) {
                     int actualIdx = config.getChatTabs().indexOf(visible.get(chattabs$hoveredTab));
-                    chattabs$startDrag(actualIdx, (int)mouseX, (int)mouseY, 0);
+                    chatTabs$startDrag(actualIdx, (int)mouseX, (int)mouseY, 0);
                 }
             } else {
                 config.selectedTab = chattabs$hoveredTab;
