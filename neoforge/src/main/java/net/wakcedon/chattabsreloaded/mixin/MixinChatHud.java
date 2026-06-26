@@ -194,6 +194,8 @@ public abstract class MixinChatHud implements IChatHud {
             this.trimmedMessages.clear();
             this.trimmedMessages.addAll((List) chattabs$savedTrimmedMessages);
             chattabs$savedTrimmedMessages = null;
+            // Invalidate filter cache so next frame always refilters
+            chattabs$lastSavedMessagesSize = -1;
         }
     }
 
