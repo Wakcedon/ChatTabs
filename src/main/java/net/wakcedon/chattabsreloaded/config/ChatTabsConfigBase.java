@@ -3,6 +3,7 @@ package net.wakcedon.chattabsreloaded.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
+import net.wakcedon.chattabsreloaded.ChatTabs;
 import net.wakcedon.chattabsreloaded.tabs.ChatLineFilter;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
 
@@ -83,14 +84,21 @@ public class ChatTabsConfigBase {
     private static PlatformConfig platformConfig;
 
     public static void setPlatformConfig(PlatformConfig config) {
+        if (config == null) {
+            ChatTabs.LOGGER.warning("Attempted to set null platformConfig!");
+            return;
+        }
         platformConfig = config;
     }
 
     public static ChatTabsConfigBase getInstance() {
         if (platformConfig != null) {
-            return platformConfig.getConfig();
+            ChatTabsConfigBase config = platformConfig.getConfig();
+            if (config != null) {
+                return config;
+            }
         }
-        return new ChatTabsConfigBase();
+        throw new IllegalStateException("ChatTabs config not properly initialized! PlatformConfig must be set before accessing config.");
     }
 
     public List<ChatTab> getVisibleChatTabs() {
@@ -121,16 +129,36 @@ public class ChatTabsConfigBase {
         chatTabs.add(0, newTab);
     }
 
+    /**
+     * Save configuration to disk.
+     * Must be implemented by platform-specific subclasses.
+     */
     public void save() {
+        throw new UnsupportedOperationException("save() must be implemented by platform-specific subclass");
     }
 
+    /**
+     * Load configuration from disk.
+     * Must be implemented by platform-specific subclasses.
+     */
     public void load() {
+        throw new UnsupportedOperationException("load() must be implemented by platform-specific subclass");
     }
 
+    /**
+     * Reload server profiles from disk.
+     * Must be implemented by platform-specific subclasses.
+     */
     public void reloadProfiles() {
+        throw new UnsupportedOperationException("reloadProfiles() must be implemented by platform-specific subclass");
     }
 
+    /**
+     * Get the profiles configuration.
+     * Must be implemented by platform-specific subclasses.
+     * @return ProfilesConfig instance, never null
+     */
     public ProfilesConfig getProfilesConfig() {
-        return null;
+        throw new UnsupportedOperationException("getProfilesConfig() must be implemented by platform-specific subclass");
     }
 }

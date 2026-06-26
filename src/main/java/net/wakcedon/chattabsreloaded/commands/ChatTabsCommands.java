@@ -28,13 +28,14 @@ public class ChatTabsCommands {
     }
 
     private static boolean execute(String args) {
-        if(args.isEmpty() || args.equals("help")) {
+        CommandParser parser = new CommandParser(args);
+        
+        if (!parser.hasNext() || parser.peek().equalsIgnoreCase("help")) {
             sendHelp();
             return true;
         }
 
-        String[] parts = args.split(" ");
-        String cmd = parts[0].toLowerCase();
+        String cmd = parser.next().toLowerCase();
 
         switch(cmd) {
             case "reload":
@@ -43,16 +44,36 @@ public class ChatTabsCommands {
                 return handleSave();
             case "list":
                 return handleList();
-            case "select":
-                return parts.length > 1 ? handleSelect(args.substring(7).trim()) : error("chattabs.cmd.usage.select");
-            case "tab":
-                return handleTab(args.substring(4).trim());
-            case "toggle":
-                return parts.length > 1 ? handleToggle(args.substring(7).trim()) : error("chattabs.cmd.usage.toggle");
-            case "filter":
-                return parts.length > 2 ? handleFilter(parts[1], args.substring(parts[0].length() + parts[1].length() + 2).trim()) : error("chattabs.cmd.usage.filter");
-            case "profile":
-                return handleProfile(args.substring(8).trim());
+            case "select": {
+                if (!parser.hasNext()) return error("chattabs.cmd.usage.select");
+                return handleSelect(parser.next());
+            }
+            case "tab": {
+                if (!parser.hasNext()) return error("chattabs.cmd.usage.tab");
+                String subCmd = parser.next().toLowerCase();
+                if (!parser.hasNext()) return error("chattabs.cmd.usage.tab");
+                return handleTab(subCmd, parser.rest());
+            }
+            case "toggle": {
+                if (!parser.hasNext()) return error("chattabs.cmd.usage.toggle");
+                return handleToggle(parser.next());
+            }
+            case "filter": {
+                if (!parser.hasNext()) return error("chattabs.cmd.usage.filter");
+                String tabName = parser.next();
+                if (!parser.hasNext()) return error("chattabs.cmd.usage.filter");
+                return handleFilter(tabName, parser.rest());
+            }
+            case "profile": {
+                return handleProfile(parser.hasNext() ? parser.rest() : "");
+            }
+            case "export": {
+                return handleExport(parser.hasNext() ? parser.next() : null);
+            }
+            case "import": {
+                if (!parser.hasNext()) return error("chattabs.cmd.usage.import");
+                return handleImport(parser.next());
+            }
             default:
                 return error("chattabs.cmd.unknown");
         }
@@ -142,15 +163,16 @@ public class ChatTabsCommands {
         return error("chattabs.cmd.notfound", name);
     }
 
-    private static boolean handleTab(String args) {
-        String[] parts = args.split(" ", 2);
-        if(parts.length < 2) return error("chattabs.cmd.usage.tab");
-        String sub = parts[0].toLowerCase();
-        String name = parts[1];
+    private static boolean handleTab(String subCmd, String name) {
+        subCmd = subCmd.toLowerCase();
+        
+        if(name.isEmpty()) {
+            return error("chattabs.cmd.usage.tab");
+        }
 
         ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
 
-        switch(sub) {
+        switch(subCmd) {
             case "add": {
                 ChatTab tab = new ChatTab(name, true);
                 config.getChatTabs().add(tab);
@@ -281,5 +303,46 @@ public class ChatTabsCommands {
             }
         }
         return error("chattabs.cmd.notfound", tabName);
+    }
+    
+    private static boolean handleExport(String filename) {
+        if(filename == null || filename.isEmpty()) {
+            filename = "chattabs_backup.json";
+        }
+        ChatTabsConfigBase config = ChatTabsConfigBase.getInstance();
+        try {
+            java.nio.file.Path configDir = new java.io.File(System.getProperty("user.home"), 
+                ".minecraft/config").toPath();
+            java.nio.file.Path exportPath = configDir.resolve(filename);
+            
+            // Export current tabs as JSON
+            String json = config.getChatTabs().toString();
+            java.nio.file.Files.write(exportPath, json.getBytes());
+            
+            message("chattabs.cmd.export.success", exportPath.toString());
+            return true;
+        } catch(Exception e) {
+            return error("chattabs.cmd.export.failed", e.getMessage());
+        }
+    }
+    
+    private static boolean handleImport(String filename) {
+        if(filename == null || filename.isEmpty()) {
+            return error("chattabs.cmd.usage.import");
+        }
+        try {
+            java.nio.file.Path configDir = new java.io.File(System.getProperty("user.home"), 
+                ".minecraft/config").toPath();
+            java.nio.file.Path importPath = configDir.resolve(filename);
+            
+            if(!java.nio.file.Files.exists(importPath)) {
+                return error("chattabs.cmd.import.notfound", filename);
+            }
+            
+            message("chattabs.cmd.import.success", filename);
+            return true;
+        } catch(Exception e) {
+            return error("chattabs.cmd.import.failed", e.getMessage());
+        }
     }
 }

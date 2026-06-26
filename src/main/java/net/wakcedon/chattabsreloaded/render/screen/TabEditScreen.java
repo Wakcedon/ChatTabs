@@ -1,12 +1,17 @@
 package net.wakcedon.chattabsreloaded.render.screen;
 
+import net.wakcedon.chattabsreloaded.ChatTabs;
 import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import net.wakcedon.chattabsreloaded.tabs.ChatTab;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class TabEditScreen extends Screen {
 
@@ -101,14 +106,51 @@ public class TabEditScreen extends Screen {
     }
 
     private void save() {
-        tab.setName(nameField.getValue());
-        tab.getFilter().setRegex(filterField.getValue());
+        // Validate regex
+        String filterRegex = filterField.getValue();
         try {
-            String hex = hexColorField.getValue().replace("#", "");
-            tab.getFilter().setHexColor((int) Long.parseLong(hex, 16));
-        } catch(Exception ignored) {}
+            Pattern.compile(filterRegex);
+        } catch(PatternSyntaxException e) {
+            ChatTabs.LOGGER.warning("Invalid regex pattern: " + e.getMessage());
+            showError("Invalid regex: " + e.getMessage());
+            return;
+        }
+        
+        // Validate HEX color
+        String hexColor = hexColorField.getValue();
+        int colorValue;
+        try {
+            String hex = hexColor.replace("#", "");
+            if(!hex.matches("^[0-9A-Fa-f]{6}$")) {
+                throw new NumberFormatException("Invalid HEX format, expected #RRGGBB");
+            }
+            colorValue = (int) Long.parseLong(hex, 16);
+        } catch(Exception e) {
+            ChatTabs.LOGGER.warning("Invalid HEX color: " + e.getMessage());
+            showError("Invalid color format. Use #RRGGBB (e.g., #FF0000)");
+            return;
+        }
+        
+        // All validations passed, save the data
+        tab.setName(nameField.getValue());
+        tab.getFilter().setRegex(filterRegex);
+        tab.getFilter().setHexColor(colorValue);
+        tab.getSendModifier().setPrefix(prefixField.getValue());
+        tab.getSendModifier().setSuffix(suffixField.getValue());
+        
         ChatTabsConfigBase.getInstance().save();
+        ChatTabs.LOGGER.info("Tab saved: " + tab.getName());
         onClose();
+    }
+    
+    private void showError(String message) {
+        Minecraft client = Minecraft.getInstance();
+        if(client.player != null) {
+            client.player.displayClientMessage(
+                Component.literal("§c[ChatTabs] ").append(Component.literal(message)),
+                false
+            );
+        }
     }
 
     @Override

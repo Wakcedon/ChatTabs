@@ -3,6 +3,7 @@ package net.wakcedon.chattabsreloaded.mixin;
 import net.wakcedon.chattabsreloaded.config.ChatTabsConfigBase;
 import net.wakcedon.chattabsreloaded.config.NeoForgeChatTabsConfig;
 import net.wakcedon.chattabsreloaded.config.ProfilesConfig;
+import net.wakcedon.chattabsreloaded.events.ServerProfileChangeDetector;
 import net.wakcedon.chattabsreloaded.mixininterface.IChatHud;
 import net.wakcedon.chattabsreloaded.profiles.ServerTabProfile;
 import net.wakcedon.chattabsreloaded.render.ChatContextMenu;
@@ -61,6 +62,14 @@ public abstract class MixinChatHud implements IChatHud {
 
     @Unique
     private final java.util.ArrayList<GhostTab> chattabs$removingTabs = new java.util.ArrayList<>();
+    
+    // Cache for filtered messages
+    @Unique
+    private String chattabs$lastFilterRegex = null;
+    @Unique
+    private int chattabs$lastFilteredTabId = -1;
+    @Unique
+    private int chattabs$lastSavedMessagesSize = -1;
 
     @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIIZ)V", at = @At("TAIL"))
     private void chattabs$onRender(GuiGraphics guiGraphics, int tickCount, int mouseX, int mouseY, boolean focused, CallbackInfo ci) {
@@ -94,6 +103,9 @@ public abstract class MixinChatHud implements IChatHud {
                 it.remove();
             }
         }
+        
+        // Check for server/profile changes
+        ServerProfileChangeDetector.tick();
     }
 
     @Unique
@@ -145,7 +157,30 @@ public abstract class MixinChatHud implements IChatHud {
         ChatTab selectedTab = config.getSelectedChatTab();
         if(selectedTab == null) return;
 
+        // Check if we need to re-filter
+        String currentRegex = selectedTab.getFilter().getRegex();
+        int currentTabId = selectedTab.getId().hashCode();
+        int currentSize = this.trimmedMessages.size();
+        
+        boolean needsRefilter = 
+            !currentRegex.equals(chattabs$lastFilterRegex) ||
+            currentTabId != chattabs$lastFilteredTabId ||
+            currentSize != chattabs$lastSavedMessagesSize;
+        
+        if(!needsRefilter) {
+            // Refiltering not needed, use cached state
+            return;
+        }
+        
+        // Update cache
+        chattabs$lastFilterRegex = currentRegex;
+        chattabs$lastFilteredTabId = currentTabId;
+        chattabs$lastSavedMessagesSize = currentSize;
+
+        // Save original messages
         chattabs$savedTrimmedMessages = new ArrayList<>(this.trimmedMessages);
+        
+        // Apply filter
         this.trimmedMessages.removeIf(line -> {
             NeoForgeChatLine wrapped = new NeoForgeChatLine(line);
             return !selectedTab.getFilter().test(wrapped);

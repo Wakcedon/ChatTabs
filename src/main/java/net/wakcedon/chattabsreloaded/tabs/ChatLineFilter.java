@@ -25,9 +25,9 @@ public class ChatLineFilter {
     }
     
     public ChatLineFilter(String filter, ColorFilter colorFilter, int hexColor, boolean filterMessages) {
-        this.regex = filter;
+        this.regex = validateRegex(filter);
         this.colorFilter = colorFilter;
-        this.hexColor = hexColor;
+        this.hexColor = validateHexColor(hexColor);
         this.filter = line -> {
             try {
                 boolean colorMatches = matchesLineColor(line);
@@ -40,6 +40,35 @@ public class ChatLineFilter {
             }
         };
         this.filterMessages = filterMessages;
+    }
+    
+    /**
+     * Validates regex pattern. Falls back to ".*" if invalid.
+     */
+    private static String validateRegex(String regex) {
+        if(regex == null || regex.isEmpty()) {
+            return ".*";
+        }
+        try {
+            java.util.regex.Pattern.compile(regex);
+            return regex;
+        } catch(PatternSyntaxException e) {
+            // Log warning and return permissive pattern
+            System.err.println("[ChatTabs] Invalid regex pattern '" + regex + "': " + e.getMessage());
+            return ".*";
+        }
+    }
+    
+    /**
+     * Validates HEX color value. Ensures it's in valid RGB range (0x000000 to 0xFFFFFF).
+     */
+    private static int validateHexColor(int hexColor) {
+        if((hexColor & 0xFF000000) == 0) {
+            // Valid - no alpha channel, just RGB
+            return hexColor & 0xFFFFFF;
+        }
+        // Strip alpha channel if present
+        return hexColor & 0xFFFFFF;
     }
     
     private boolean matchesLineColor(ChatLine line) {

@@ -67,7 +67,16 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
     }
 
     public void loadProfiles() {
-        profilesConfig = ProfilesConfig.load(profilesPath);
+        try {
+            profilesConfig = ProfilesConfig.load(profilesPath);
+            if (profilesConfig == null) {
+                ChatTabs.LOGGER.warning("ProfilesConfig load returned null, creating default");
+                profilesConfig = ProfilesConfig.createDefault();
+            }
+        } catch (Exception e) {
+            ChatTabs.LOGGER.warning("Error loading profiles, creating default: " + e.getMessage());
+            profilesConfig = ProfilesConfig.createDefault();
+        }
     }
 
     @Override
@@ -76,8 +85,20 @@ public class NeoForgeChatTabsConfig extends ChatTabsConfigBase implements Platfo
         ChatTabs.LOGGER.info("Reloaded profiles config");
     }
 
+    /**
+     * Get the profiles configuration.
+     * Guaranteed to never return null - returns default if not loaded.
+     */
     public ProfilesConfig getProfilesConfig() {
-        if(profilesConfig == null) loadProfiles();
+        if(profilesConfig == null) {
+            ChatTabs.LOGGER.warning("getProfilesConfig called before load, initializing profiles");
+            loadProfiles();
+        }
+        // Final safety check - should never happen
+        if(profilesConfig == null) {
+            ChatTabs.LOGGER.severe("CRITICAL: ProfilesConfig is still null after load! Creating default");
+            profilesConfig = ProfilesConfig.createDefault();
+        }
         return profilesConfig;
     }
 

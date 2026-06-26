@@ -26,13 +26,14 @@ public class ChatTab {
     
     private final Deque<ChatLine> visibleLines = new LinkedList<>();
     
-    private boolean firstMessageUnread = true;
-    private int messagesAtLastSeen = 0;
+    // Unread tracking - stores how many messages existed when tab was last viewed
+    private int messagesWhenLastFocused = 0;
+    
+    // Animation timers
     private long lastUnreadTime = 0;
     private long blinkDuration = 3000;
     private static final long FIRST_BLINK_MS = 3000;
     private static final long SUBSEQUENT_BLINK_MS = 1500;
-
     private long badgeAppearStart = 0;
     
     public ChatTab(String id, String name, boolean save, boolean visibleByDefault, ChatLineFilter filter, SendModifier sendModifier) {
@@ -118,27 +119,40 @@ public class ChatTab {
     public void addChatLine(ChatLine line) {
         boolean hadUnreads = hasUnreads();
         visibleLines.addFirst(line);
+        
+        // Trim old messages
         while(visibleLines.size() > net.wakcedon.chattabsreloaded.ChatTabs.getMaxLines()) {
             visibleLines.removeLast();
         }
-        if(hasUnreads()) {
+        
+        // Update unread state - new message means we have unreads now
+        if(!hadUnreads) {
+            // Transitioning from no unreads to having unreads
             lastUnreadTime = System.currentTimeMillis();
-            blinkDuration = hadUnreads ? SUBSEQUENT_BLINK_MS : FIRST_BLINK_MS;
-            if(!hadUnreads) {
-                badgeAppearStart = System.currentTimeMillis();
-            }
+            blinkDuration = FIRST_BLINK_MS;
+            badgeAppearStart = System.currentTimeMillis();
+        } else {
+            // Already had unreads, update animation timer
+            lastUnreadTime = System.currentTimeMillis();
+            blinkDuration = SUBSEQUENT_BLINK_MS;
         }
     }
     
+    /**
+     * Called when this tab becomes focused/selected.
+     * Marks all current messages as read.
+     */
     public void setFocused(boolean focused) {
         if(focused) {
-            firstMessageUnread = false;
+            // Tab is now focused - mark all current messages as read
+            messagesWhenLastFocused = visibleLines.size();
+            lastUnreadTime = 0;
+            badgeAppearStart = 0;
         } else {
-            messagesAtLastSeen = visibleLines.size();
-            firstMessageUnread = false;
+            // Tab is unfocused - keep current unread state for animation
+            lastUnreadTime = 0;
+            badgeAppearStart = 0;
         }
-        lastUnreadTime = 0;
-        badgeAppearStart = 0;
     }
 
     public float getBadgeAlpha() {
@@ -166,25 +180,22 @@ public class ChatTab {
     
     public void clear(boolean totalClear) {
         visibleLines.clear();
-        firstMessageUnread = true;
-        messagesAtLastSeen = 0;
+        messagesWhenLastFocused = 0;
     }
     
-    public int getLastSeenMessage() {
-        if(firstMessageUnread) return Math.max(0, visibleLines.size() - 1);
-        int unreadCount = Math.max(0, visibleLines.size() - messagesAtLastSeen);
-        return Math.max(0, unreadCount - 1);
-    }
-    
-    public boolean hasUnreads() {
-        if(visibleLines.isEmpty()) return false;
-        if(firstMessageUnread) return true;
-        return visibleLines.size() > messagesAtLastSeen;
-    }
-
+    /**
+     * Returns the number of unread messages in this tab.
+     * Only called when tab is NOT focused.
+     */
     public int getUnreadCount() {
         if(visibleLines.isEmpty()) return 0;
-        if(firstMessageUnread) return visibleLines.size();
-        return Math.max(0, visibleLines.size() - messagesAtLastSeen);
+        return Math.max(0, visibleLines.size() - messagesWhenLastFocused);
+    }
+    
+    /**
+     * Returns true if this tab has any unread messages.
+     */
+    public boolean hasUnreads() {
+        return getUnreadCount() > 0;
     }
 }
